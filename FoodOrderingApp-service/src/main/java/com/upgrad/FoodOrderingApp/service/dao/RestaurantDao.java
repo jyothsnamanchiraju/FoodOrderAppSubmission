@@ -2,6 +2,7 @@ package com.upgrad.FoodOrderingApp.service.dao;
 
 import com.upgrad.FoodOrderingApp.service.entity.*;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -118,7 +119,7 @@ public class RestaurantDao {
 
     public CustomerAuthEntity authoriseUserLogout(String authorization) {
         try {
-            return (CustomerAuthEntity) entityManager.createNativeQuery("select c.* from customer_auth c where c.access_token = ? and c.logout_at!=null;", CustomerAuthEntity.class)
+            return (CustomerAuthEntity) entityManager.createNativeQuery("select c.* from customer_auth c where c.access_token like ? and c.logout_at is null;", CustomerAuthEntity.class)
                     .setParameter(1, authorization)
                     .getSingleResult();
         }
@@ -138,6 +139,7 @@ public class RestaurantDao {
         }
     }
 
+    @Transactional
     public RestaurantEntity updateRatings(RestaurantEntity restaurant) {
         try{
             entityManager.persist(restaurant);
