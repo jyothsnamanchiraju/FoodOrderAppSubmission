@@ -75,4 +75,18 @@ public class RestaurantService {
     public RestaurantEntity updateNewratingsForRestaurant(RestaurantEntity restaurant) {
         return restaurantDao.updateRatings(restaurant);
     }
+
+    //Display restaurant details by restaurant UUID
+    public RestaurantEntity restaurantByUUID(String uuid) throws RestaurantNotFoundException {
+        if (uuid.equals("")) {
+            throw new RestaurantNotFoundException("RNF-002", "Restaurant id field should not be empty");
+        }
+
+        RestaurantEntity restaurantEntity = restaurantDao.getRestaurantByUUID(uuid);
+
+        if (restaurantEntity == null) {
+            throw new RestaurantNotFoundException("RNF-001", "No restaurant by this id");
+        }
+        return restaurantEntity;
+    }
 }
