@@ -221,7 +221,8 @@ public class RestaurantController {
     @ResponseBody
     public ResponseEntity<RestaurantUpdatedResponse> updateRestaurant(@RequestHeader("authorization") final String authorization, @PathVariable(value = "restaurant_id", required = false) String restaurantId, @RequestParam(value = "CustomerRating") Double rating) throws AuthorizationFailedException, RestaurantNotFoundException, InvalidRatingException {
 
-        restaurantService.authorize(authorization);
+        String[] auth = authorization.split(" ");
+        restaurantService.authorize(auth[1]);
 
         if(restaurantId.isEmpty() || restaurantId.equals(null)){
             throw new RestaurantNotFoundException("RNF-002", "Restaurant id field should not be empty");
