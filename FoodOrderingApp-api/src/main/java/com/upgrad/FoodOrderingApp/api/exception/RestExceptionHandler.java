@@ -94,4 +94,20 @@ public class RestExceptionHandler {
                 new ErrorResponse().code(exc.getCode()).message(exc.getErrorMessage()), HttpStatus.NOT_FOUND
         );
     }
+
+    //CategoryNotFoundException
+    @ExceptionHandler(CategoryNotFoundException.class)
+    public ResponseEntity<ErrorResponse> categoryNotFound(CategoryNotFoundException exception, WebRequest request){
+        return new ResponseEntity<>(
+                new ErrorResponse().code(exception.getCode()).message(exception.getErrorMessage()), HttpStatus.NOT_FOUND
+        );
+    }
+
+    //InvalidRequest
+    @ExceptionHandler(InvalidRatingException.class)
+    public ResponseEntity<ErrorResponse> invalidRatingException(InvalidRatingException exception, WebRequest request){
+        return new ResponseEntity<>(
+                new ErrorResponse().code(exception.getCode()).message(exception.getErrorMessage()), HttpStatus.BAD_REQUEST
+        );
+    }
 }
