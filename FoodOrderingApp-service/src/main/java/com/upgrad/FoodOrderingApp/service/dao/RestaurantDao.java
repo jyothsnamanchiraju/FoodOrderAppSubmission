@@ -119,7 +119,7 @@ public class RestaurantDao {
 
     public CustomerAuthEntity authoriseUserLogout(String authorization) {
         try {
-            return (CustomerAuthEntity) entityManager.createNativeQuery("select c.* from customer_auth c where c.access_token like ? and c.logout_at is null;", CustomerAuthEntity.class)
+            return (CustomerAuthEntity) entityManager.createNativeQuery("select c.* from customer_auth c where c.access_token = ? and c.logout_at is null;", CustomerAuthEntity.class)
                     .setParameter(1, authorization)
                     .getSingleResult();
         }
@@ -142,7 +142,7 @@ public class RestaurantDao {
     @Transactional
     public RestaurantEntity updateRatings(RestaurantEntity restaurant) {
         try{
-            entityManager.persist(restaurant);
+            entityManager.merge(restaurant);
             return restaurant;
         }
         catch(NoResultException exception){
