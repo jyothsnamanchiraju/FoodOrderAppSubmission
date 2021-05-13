@@ -236,10 +236,14 @@ public class RestaurantController {
 
         Double ratingIndex = (restaurant.getCustomerRating()*restaurant.getNumberOfCustomersRated());
 
+        Integer numberOfCustomers =  restaurant.getNumberOfCustomersRated()+1;
 
-        restaurant.setNumberOfCustomersRated(restaurant.getNumberOfCustomersRated()+1);
+        restaurant.setNumberOfCustomersRated(numberOfCustomers);
 
-        restaurant.setCustomerRating((ratingIndex+rating)/restaurant.getNumberOfCustomersRated());
+        double newRating = (ratingIndex+rating)/numberOfCustomers;
+        newRating = Math.floor(newRating*100)/100;
+
+        restaurant.setCustomerRating(newRating);
 
         RestaurantEntity result = restaurantService.updateNewratingsForRestaurant(restaurant);
 

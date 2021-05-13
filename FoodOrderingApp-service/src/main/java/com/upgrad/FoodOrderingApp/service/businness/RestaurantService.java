@@ -7,7 +7,10 @@ import com.upgrad.FoodOrderingApp.service.exception.CategoryNotFoundException;
 import com.upgrad.FoodOrderingApp.service.exception.RestaurantNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @Service
@@ -59,19 +62,23 @@ public class RestaurantService {
     }
 
     public void authorize(String authorization) throws AuthorizationFailedException {
+        
         CustomerAuthEntity authorizedUser = restaurantDao.authoriseUser(authorization);
 
         if(authorizedUser==null){
             throw new AuthorizationFailedException("ATHR-001", "Customer is not Logged in.");
         }
-        else if(restaurantDao.authoriseUserLogout(authorization)==null){
+       // else if(restaurantDao.authoriseUserLogout(authorization)==null){
+        else if(authorizedUser.getLogoutAt() != null){
             throw new AuthorizationFailedException("ATHR-002", "Customer is logged out. Log in again to access this endpoint.");
         }
-        else if(restaurantDao.authoriseUserSession(authorization)==null){
+        //else if(restaurantDao.authoriseUserSession(authorization)==null){
+        else if((authorizedUser.getExpiresAt().compareTo(ZonedDateTime.now())) < 0){
             throw new AuthorizationFailedException("ATHR-003", "Your session is expired. Log in again to access this endpoint.");
         }
     }
 
+    @Transactional(propagation = Propagation.REQUIRED)
     public RestaurantEntity updateNewratingsForRestaurant(RestaurantEntity restaurant) {
         return restaurantDao.updateRatings(restaurant);
     }
