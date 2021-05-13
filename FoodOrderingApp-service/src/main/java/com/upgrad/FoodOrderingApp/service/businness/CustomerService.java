@@ -243,5 +243,25 @@ public class CustomerService {
         else
             return false;
     }
+
+    //This method is the Bearer authorization method
+    @Transactional(propagation = Propagation.REQUIRED)
+    public CustomerEntity getCustomer(final String accessToken)throws AuthorizationFailedException{
+
+        CustomerAuthEntity customerAuthEntity = customerDao.getCustomerAuthByToken(accessToken);
+
+        if(customerAuthEntity == null){
+            throw new AuthorizationFailedException("ATHR-001","Customer is not Logged in.");
+        }
+        else if (customerAuthEntity != null && customerAuthEntity.getLogoutAt()!= null){
+            throw new AuthorizationFailedException("ATHR-002","Customer is logged out. Log in again to access this endpoint.");
+        }
+        else if (customerAuthEntity != null && ZonedDateTime.now().isAfter(customerAuthEntity.getExpiresAt())){
+            throw new AuthorizationFailedException("ATHR-003","Your session is expired. Log in again to access this endpoint.");
+        }
+        else {
+            return customerAuthEntity.getCustomer();
+        }
+    }
 }
 
