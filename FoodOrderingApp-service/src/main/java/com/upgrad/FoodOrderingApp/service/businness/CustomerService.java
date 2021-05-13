@@ -90,32 +90,19 @@ public class CustomerService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public CustomerEntity updatePassword(String accessToken, String oldPassword, String newPassword)
-            throws UpdateCustomerException, AuthorizationFailedException{
-
-        CustomerAuthEntity customerAuthEntity = customerDao.getCustomerAuthByToken(accessToken);
-
-        if(customerAuthEntity == null) {
-            throw new AuthorizationFailedException("ATHR-001","Customer is not Logged in.");
-        }
-
-        if(customerAuthEntity.getLogoutAt() != null){
-            throw new AuthorizationFailedException("ATHR-002","Customer is logged out. Log in again to access this endpoint.");
-        }
-
-        final ZonedDateTime now = ZonedDateTime.now();
-
-        if((customerAuthEntity.getExpiresAt().compareTo(now)) < 0){
-            throw new AuthorizationFailedException("ATHR-003","Your session is expired. Log in again to access this endpoint.");
-        }
+    public CustomerEntity updateCustomerPassword(final String oldPassword, final String newPassword, final CustomerEntity customerEntity)
+            throws UpdateCustomerException {
 
         if(!checkPasswordStrength(newPassword)){
             throw new UpdateCustomerException("UCR-001", "Weak password!");
         }
 
-        CustomerEntity customerEntity = customerAuthEntity.getCustomer();
+        if(newPassword == null || newPassword.equals(" ") ||
+                oldPassword ==null || oldPassword.equals(" ")){
+            throw new UpdateCustomerException("UCR-003","No field should be empty");
+        }
 
-        String encryptedOldPassword = cryptographyProvider.encrypt(oldPassword,customerEntity.getSalt());
+        String encryptedOldPassword = cryptographyProvider.encrypt(oldPassword, customerEntity.getSalt());
 
         if(encryptedOldPassword.compareTo(customerEntity.getPassword()) != 0){
             throw new UpdateCustomerException("UCR-004", "Incorrect old password!");

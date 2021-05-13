@@ -134,28 +134,26 @@ public class CustomerController {
 
 
     @RequestMapping(method = RequestMethod.PUT, path = "/customer/password", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<UpdatePasswordResponse> changeCustomerPassword(@RequestHeader("authorization") final String authorization,
-                                                                 final UpdatePasswordRequest updatePasswordRequest)
+    public ResponseEntity<UpdatePasswordResponse> changeCustomerPassword(
+            @RequestHeader("authorization") final String authorization,
+            final UpdatePasswordRequest updatePasswordRequest)
             throws UpdateCustomerException, AuthorizationFailedException {
 
         String[] bearerToken = authorization.split("Bearer ");
         String accessToken = bearerToken[1];
 
-        if(updatePasswordRequest.getNewPassword()== null || updatePasswordRequest.getNewPassword()== " " ||
-           updatePasswordRequest.getOldPassword()==null ||  updatePasswordRequest.getOldPassword()== " "){
-            throw new UpdateCustomerException("UCR-003","No field should be empty");
-        }
-            String oldPassword = updatePasswordRequest.getOldPassword();
-            String newPassword = updatePasswordRequest.getNewPassword();
-            CustomerEntity customerEntity = customerService.updatePassword(accessToken, oldPassword, newPassword);
+        CustomerEntity customerEntity = customerService.getCustomer(accessToken);
 
-            String uuid = customerEntity.getUuid();
+        String oldPassword = updatePasswordRequest.getOldPassword();
+        String newPassword = updatePasswordRequest.getNewPassword();
 
-            UpdatePasswordResponse updatePasswordResponse =  new UpdatePasswordResponse();
-            updatePasswordResponse.setId(uuid);
-            updatePasswordResponse.setStatus("CUSTOMER PASSWORD UPDATED SUCCESSFULLY");
+        CustomerEntity updatedCustomer = customerService.updateCustomerPassword(oldPassword, newPassword, customerEntity);
 
-            return new ResponseEntity<UpdatePasswordResponse>(updatePasswordResponse, HttpStatus.OK);
+        UpdatePasswordResponse updatePasswordResponse =  new UpdatePasswordResponse();
+        updatePasswordResponse.setId(updatedCustomer.getUuid());
+        updatePasswordResponse.setStatus("CUSTOMER PASSWORD UPDATED SUCCESSFULLY");
+
+        return new ResponseEntity<UpdatePasswordResponse>(updatePasswordResponse, HttpStatus.OK);
     }
 
 }
