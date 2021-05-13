@@ -83,32 +83,10 @@ public class CustomerService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public CustomerEntity updateCustomer(String accessToken, String firstName, String lastName)
-            throws UpdateCustomerException, AuthorizationFailedException{
+    public CustomerEntity updateCustomer(final CustomerEntity customerEntity) {
 
-        CustomerAuthEntity customerAuthEntity = customerDao.getCustomerAuthByToken(accessToken);
-
-        if(customerAuthEntity == null) {
-            throw new AuthorizationFailedException("ATHR-001","Customer is not Logged in.");
-        }
-
-        if(customerAuthEntity.getLogoutAt() != null){
-            throw new AuthorizationFailedException("ATHR-002","Customer is logged out. Log in again to access this endpoint.");
-        }
-
-        final ZonedDateTime now = ZonedDateTime.now();
-
-        if((customerAuthEntity.getExpiresAt().compareTo(now)) < 0){
-            throw new AuthorizationFailedException("ATHR-003","Your session is expired. Log in again to access this endpoint.");
-        }
-
-        CustomerEntity updateCustomer = customerAuthEntity.getCustomer();
-        updateCustomer.setFirstName(firstName);
-        updateCustomer.setLastName(lastName);
-
-        CustomerEntity updatedCust = customerDao.updateCustomerEntity(updateCustomer);
-        return updatedCust;
-
+        CustomerEntity updatedCustomer = customerDao.updateCustomerEntity(customerEntity);
+        return updatedCustomer;
     }
 
     @Transactional(propagation = Propagation.REQUIRED)

@@ -109,20 +109,23 @@ public class CustomerController {
 
         String[] bearerToken = authorization.split("Bearer ");
         String accessToken = bearerToken[1];
+        CustomerEntity customerEntity = customerService.getCustomer(accessToken);
 
-        if(updateCustomerRequest.getFirstName() == null || updateCustomerRequest.getFirstName()==" "){
-            throw new UpdateCustomerException("UCR-002", "First name field should not be empty");
-        }
         String firstName = updateCustomerRequest.getFirstName();
         String lastName= updateCustomerRequest.getLastName();
 
-        CustomerEntity customerEntity = customerService.updateCustomer(accessToken,firstName,lastName);
-        String uuid = customerEntity.getUuid();
+        if(firstName == null || firstName.equals(" ")){
+            throw new UpdateCustomerException("UCR-002", "First name field should not be empty");
+        }
+
+        customerEntity.setFirstName(updateCustomerRequest.getFirstName());
+        customerEntity.setLastName(updateCustomerRequest.getLastName());
+
+        final CustomerEntity updatedCustomer = customerService.updateCustomer(customerEntity);
 
         UpdateCustomerResponse updateCustomerResponse = new UpdateCustomerResponse();
-        updateCustomerResponse.setId(uuid);
+        updateCustomerResponse.setId(updatedCustomer.getUuid());
         updateCustomerResponse.setStatus("CUSTOMER DETAILS UPDATED SUCCESSFULLY");
-      //  updateCustomerResponse.setStatus("201");
         updateCustomerResponse.setFirstName(firstName);
         updateCustomerResponse.setLastName(lastName);
 
