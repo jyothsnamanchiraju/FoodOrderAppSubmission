@@ -152,7 +152,7 @@ public class CustomerService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public CustomerEntity signup(CustomerEntity customerEntity)throws SignUpRestrictedException{
+    public CustomerEntity saveCustomer(CustomerEntity customerEntity)throws SignUpRestrictedException{
 
         //check if the contact_number already exists for another account
         CustomerEntity checkCustomer = customerDao.getCustomerByContactNumber(customerEntity.getContactNumber());
