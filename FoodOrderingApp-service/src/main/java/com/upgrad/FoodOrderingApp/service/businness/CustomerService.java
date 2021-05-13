@@ -57,7 +57,7 @@ public class CustomerService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public CustomerEntity logout(final String accessToken) throws AuthorizationFailedException{
+    public CustomerAuthEntity logout(final String accessToken) throws AuthorizationFailedException{
         CustomerAuthEntity customerAuthEntity = customerDao.getCustomerAuthByToken(accessToken);
 
         if(customerAuthEntity == null) {
@@ -77,9 +77,7 @@ public class CustomerService {
         customerAuthEntity.setLogoutAt(now);
         customerDao.updateLogoutTime(customerAuthEntity);
 
-        CustomerEntity customerEntity = customerAuthEntity.getCustomer();
-
-        return customerEntity;
+        return customerAuthEntity;
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
