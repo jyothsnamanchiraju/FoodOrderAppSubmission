@@ -151,6 +151,70 @@ public class CustomerService {
         return updatedCustomer;
     }
 
+    @Transactional(propagation = Propagation.REQUIRED)
+    public CustomerEntity signup(CustomerEntity customerEntity)throws SignUpRestrictedException{
+
+        //check if the contact_number already exists for another account
+        CustomerEntity checkCustomer = customerDao.getCustomerByContactNumber(customerEntity.getContactNumber());
+        if(checkCustomer !=null){
+            throw new SignUpRestrictedException("SGR-001", "This contact number is already registered! Try other contact number.");
+        }
+
+        //check if all fields are filled
+        if(customerEntity.getFirstName() == null || customerEntity.getFirstName() == " " ||
+                customerEntity.getEmail() == null || customerEntity.getEmail() == " " ||
+                customerEntity.getContactNumber() == null || customerEntity.getContactNumber() == " " ||
+                customerEntity. getPassword() == null || customerEntity.getPassword()==" " ){
+            throw new SignUpRestrictedException("SGR-005", "Except last name all fields should be filled");
+        }
+
+        if(!checkEmail(customerEntity.getEmail())){
+            throw new SignUpRestrictedException("SGR-002", "Invalid email-id format!");
+        }
+
+        String contact = customerEntity.getContactNumber();
+        if(contact.length() !=10){
+            throw new SignUpRestrictedException("SGR-003", "Invalid contact number!");
+        }
+
+        boolean strongPassword = checkPasswordStrength(customerEntity.getPassword());
+        if(!strongPassword){
+            throw new SignUpRestrictedException("SGR-004", "Weak password!");
+        }
+
+        String[] encryptedText = cryptographyProvider.encrypt(customerEntity.getPassword());
+        customerEntity.setSalt(encryptedText[0]);
+        customerEntity.setPassword(encryptedText[1]);
+
+        return customerDao.createCustomer(customerEntity);
+
+    }
+
+    private boolean checkEmail(String email){
+        boolean hasAtSymbol = false;
+        boolean hasDot = false;
+
+        for(int i=0; i<email.length(); i++){
+            if(email.charAt(i)=='@'){
+                hasAtSymbol = true;
+            }
+            if(email.charAt(i)=='.'){
+                hasDot = true;
+            }
+        }
+
+        int len = email.length();
+
+        if(email.charAt(len-3)!='.' && email.charAt(len-4)!='.'){
+            hasDot = false;
+        }
+
+        if(hasAtSymbol && hasDot)
+            return true;
+        else
+            return false;
+
+    }
 
     private boolean checkPasswordStrength(String password){
         if (password.length()<8)

@@ -13,7 +13,6 @@ import com.upgrad.FoodOrderingApp.service.exception.*;
 
 import com.upgrad.FoodOrderingApp.service.entity.CustomerEntity;
 import com.upgrad.FoodOrderingApp.service.entity.CustomerAuthEntity;
-import com.upgrad.FoodOrderingApp.service.businness.CustomerSignupService;
 import com.upgrad.FoodOrderingApp.service.businness.CustomerService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +26,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestHeader;
 
-import java.time.ZonedDateTime;
 import java.util.UUID;
 import java.util.Base64;
 
@@ -36,7 +34,7 @@ import java.util.Base64;
 
 public class CustomerController {
    @Autowired
-    private CustomerSignupService customerSignupService;
+    private CustomerService customerService;
 
     @RequestMapping(method= RequestMethod.POST, path ="/customer/signup", consumes=MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<SignupCustomerResponse> signup(final SignupCustomerRequest signupCustomerRequest) throws SignUpRestrictedException{
@@ -50,14 +48,11 @@ public class CustomerController {
         customerEntity.setContactNumber(signupCustomerRequest.getContactNumber());
         customerEntity.setPassword(signupCustomerRequest.getPassword());
 
-        final CustomerEntity createdCustomerEntity = customerSignupService.signup(customerEntity);
+        final CustomerEntity createdCustomerEntity = customerService.signup(customerEntity);
         SignupCustomerResponse signupCustomerResponse = new SignupCustomerResponse().id(createdCustomerEntity.getUuid()).status("CUSTOMER SUCCESSFULLY REGISTERED") ;
         return new ResponseEntity<SignupCustomerResponse>(signupCustomerResponse, HttpStatus.CREATED);
     }
 
-
-    @Autowired
-    private CustomerService customerService;
 
     @RequestMapping(method = RequestMethod.POST, path="/customer/login", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<LoginResponse> login(@RequestHeader("authorization") final String authorization) throws AuthenticationFailedException{
