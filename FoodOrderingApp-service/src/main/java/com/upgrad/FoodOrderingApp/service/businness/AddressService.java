@@ -2,6 +2,7 @@ package com.upgrad.FoodOrderingApp.service.businness;
 
 import com.upgrad.FoodOrderingApp.service.businness.PasswordCryptographyProvider;
 
+import com.upgrad.FoodOrderingApp.service.dao.CustomerAddressDao;
 import com.upgrad.FoodOrderingApp.service.entity.CustomerEntity;
 import com.upgrad.FoodOrderingApp.service.entity.CustomerAuthEntity;
 import com.upgrad.FoodOrderingApp.service.entity.AddressEntity;
@@ -31,6 +32,9 @@ public class AddressService {
     private AddressDao addressDao;
 
     @Autowired
+    private CustomerAddressDao customerAddressDao;
+
+    @Autowired
     private PasswordCryptographyProvider cryptographyProvider;
 
     @Transactional(propagation = Propagation.REQUIRED)
@@ -45,6 +49,34 @@ public class AddressService {
         addressDao.recordCustomerAddressEntity(customerAddressEntity);
 
         return createdAddress;
+    }
+
+    public AddressEntity getAddressByUUID(final String addressUuid, final CustomerEntity customerEntity) throws AddressNotFoundException, AuthorizationFailedException {
+        //if address id is empty, throw exception
+        if(addressUuid.isEmpty()){
+            throw new AddressNotFoundException("ANF-005", "Address id can not be empty");
+        }
+
+        AddressEntity addressEntityToBeDeleted = addressDao.getAddressByUuid(addressUuid);
+
+        //if address id is incorrect and no such address exist in database
+        if(addressEntityToBeDeleted == null){
+            throw new AddressNotFoundException("ANF-003", "No address by this id");
+        }
+        else {
+            final CustomerAddressEntity customerAddressEntity = getCustomerAddressByAddressId(addressEntityToBeDeleted);
+            final CustomerEntity belongsToAddressEntity = customerAddressEntity.getCustomer();
+            if(!belongsToAddressEntity.getUuid().equals(customerEntity.getUuid())){
+                throw new AuthorizationFailedException("ATHR-004", "You are not authorized to view/update/delete any one else's address ");
+            }
+            else {
+                return addressEntityToBeDeleted;
+            }
+        }
+    }
+
+    public CustomerAddressEntity getCustomerAddressByAddressId(final AddressEntity addressEntity){
+        return customerAddressDao.getCustomerAddressByAddressId(addressEntity);
     }
 
     @Transactional(propagation = Propagation.REQUIRED)

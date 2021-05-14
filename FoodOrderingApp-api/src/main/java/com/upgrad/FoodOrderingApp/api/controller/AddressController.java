@@ -85,7 +85,7 @@ public class AddressController {
     }
 
 
-    @RequestMapping(method= RequestMethod.GET, path ="address/customer", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(method= RequestMethod.GET, path ="/address/customer", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<AddressListResponse> getAllAddresses(@RequestHeader("authorization") final String authorization)
             throws AuthorizationFailedException {
 
