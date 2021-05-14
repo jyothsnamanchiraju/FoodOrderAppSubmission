@@ -95,11 +95,6 @@ public class CustomerService {
             throw new UpdateCustomerException("UCR-001", "Weak password!");
         }
 
-        if(newPassword == null || newPassword.equals(" ") ||
-                oldPassword ==null || oldPassword.equals(" ")){
-            throw new UpdateCustomerException("UCR-003","No field should be empty");
-        }
-
         String encryptedOldPassword = cryptographyProvider.encrypt(oldPassword, customerEntity.getSalt());
 
         if(encryptedOldPassword.compareTo(customerEntity.getPassword()) != 0){
