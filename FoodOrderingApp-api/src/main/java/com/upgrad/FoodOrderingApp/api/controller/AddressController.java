@@ -26,11 +26,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpHeaders;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -50,22 +46,26 @@ public class AddressController {
     private CustomerService customerService;
 
     @RequestMapping(method= RequestMethod.POST, path ="/address", consumes=MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<SaveAddressResponse> createCustomerAddress(@RequestHeader("authorization") final String authorization, final SaveAddressRequest saveAddressRequest)
+    public ResponseEntity<SaveAddressResponse> createCustomerAddress(
+            @RequestBody(required = false) final SaveAddressRequest saveAddressRequest,
+            @RequestHeader("authorization") final String authorization)
             throws AuthorizationFailedException, SaveAddressException, AddressNotFoundException {
-
+        System.out.println(saveAddressRequest);
         String[] bearerToken = authorization.split("Bearer ");
         String customerAccessToken = bearerToken[1];
+
         CustomerEntity customerEntity = customerService.getCustomer(customerAccessToken);
 
-        if(saveAddressRequest.getFlatBuildingName()== null || saveAddressRequest.getFlatBuildingName()==" "
-                || saveAddressRequest.getLocality() == null || saveAddressRequest.getLocality() == null
-                || saveAddressRequest.getCity()== null || saveAddressRequest.getCity()== " "
-                || saveAddressRequest.getPincode()== null ||saveAddressRequest.getPincode()== " "
-                || saveAddressRequest.getStateUuid()==null || saveAddressRequest.getStateUuid()== " "){
+        try {
+            saveAddressRequest.getFlatBuildingName().isEmpty();
+            saveAddressRequest.getLocality().isEmpty();
+            saveAddressRequest.getCity().isEmpty();
+            saveAddressRequest.getPincode().isEmpty();
+            saveAddressRequest.getStateUuid().isEmpty();
+        } catch (Exception e) {
             throw new SaveAddressException("SAR-001", "No field can be empty");
         }
 
-        String pinCode = addressService.validatePincode(saveAddressRequest.getPincode());
         StateEntity stateEntity = addressService.getStateByUUID(saveAddressRequest.getStateUuid());
 
         AddressEntity addressEntity = new AddressEntity();

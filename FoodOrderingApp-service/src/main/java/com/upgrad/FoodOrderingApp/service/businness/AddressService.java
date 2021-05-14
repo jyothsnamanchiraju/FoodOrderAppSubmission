@@ -39,8 +39,9 @@ public class AddressService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     public AddressEntity saveAddress(final AddressEntity addressEntity, final CustomerEntity customerEntity)
-            throws AuthorizationFailedException, AddressNotFoundException {
+            throws SaveAddressException {
 
+        validatePincode(addressEntity.getPincode());
         AddressEntity createdAddress = addressDao.createNewAddress(addressEntity);
 
         CustomerAddressEntity customerAddressEntity = new CustomerAddressEntity();
@@ -126,7 +127,7 @@ public class AddressService {
 
     }
 
-    private CustomerAuthEntity checkAuthorization(String customerAccessToken) throws AuthorizationFailedException{
+    private CustomerEntity checkAuthorization(String customerAccessToken) throws AuthorizationFailedException{
 
         CustomerAuthEntity customerAuthEntity = customerDao.getCustomerAuthByToken(customerAccessToken);
 
@@ -144,7 +145,7 @@ public class AddressService {
             throw new AuthorizationFailedException("ATHR-003","Your session is expired. Log in again to access this endpoint.");
         }
 
-        return customerAuthEntity;
+        return customerAuthEntity.getCustomer();
     }
 
     public String validatePincode(String pincode) throws SaveAddressException {
