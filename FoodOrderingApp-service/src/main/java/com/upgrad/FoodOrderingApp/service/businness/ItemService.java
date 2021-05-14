@@ -1,6 +1,7 @@
 package com.upgrad.FoodOrderingApp.service.businness;
 
 import com.upgrad.FoodOrderingApp.service.dao.ItemDao;
+import com.upgrad.FoodOrderingApp.service.dao.OrderDao;
 import com.upgrad.FoodOrderingApp.service.dao.OrderItemDao;
 import com.upgrad.FoodOrderingApp.service.dao.RestaurantDao;
 import com.upgrad.FoodOrderingApp.service.entity.ItemEntity;
@@ -12,6 +13,7 @@ import com.upgrad.FoodOrderingApp.service.exception.RestaurantNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -52,5 +54,11 @@ public class ItemService {
             throw new ItemNotFoundException("INF-003", "No item by this id exist");
         }
         return itemEntity;
+    }
+
+    //List top 5 items in a restaurant
+    //Sorted by number of orders - descending
+    public List<ItemEntity> getItemsByPopularity(RestaurantEntity restaurantEntity) {
+        return itemDao.getTopItems(restaurantEntity.getId());
     }
 }
