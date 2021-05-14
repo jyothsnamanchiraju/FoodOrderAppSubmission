@@ -118,23 +118,30 @@ public class CustomerController {
 
 
     @RequestMapping(method = RequestMethod.PUT, path = "/customer", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<UpdateCustomerResponse> updateCustomer(@RequestHeader("authorization") final String authorization,
-                                                                 final UpdateCustomerRequest updateCustomerRequest)
+    public ResponseEntity<UpdateCustomerResponse> updateCustomer(
+            @RequestHeader("authorization") final String authorization,
+            @RequestBody final UpdateCustomerRequest updateCustomerRequest)
             throws UpdateCustomerException, AuthorizationFailedException {
-
-        String[] bearerToken = authorization.split("Bearer ");
-        String accessToken = bearerToken[1];
-        CustomerEntity customerEntity = customerService.getCustomer(accessToken);
 
         String firstName = updateCustomerRequest.getFirstName();
         String lastName= updateCustomerRequest.getLastName();
 
-        if(firstName == null || firstName.equals(" ")){
+        try {
+            firstName.isEmpty();
+        } catch (Exception e) {
             throw new UpdateCustomerException("UCR-002", "First name field should not be empty");
         }
 
-        customerEntity.setFirstName(updateCustomerRequest.getFirstName());
-        customerEntity.setLastName(updateCustomerRequest.getLastName());
+        if(firstName.equals("")){
+            throw new UpdateCustomerException("UCR-002", "First name field should not be empty");
+        }
+
+        String[] bearerToken = authorization.split("Bearer ");
+        String accessToken = bearerToken[1];
+
+        CustomerEntity customerEntity = customerService.getCustomer(accessToken);
+        customerEntity.setFirstName(firstName);
+        customerEntity.setLastName(lastName);
 
         final CustomerEntity updatedCustomer = customerService.updateCustomer(customerEntity);
 
