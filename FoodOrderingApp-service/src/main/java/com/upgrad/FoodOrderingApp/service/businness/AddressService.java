@@ -34,27 +34,17 @@ public class AddressService {
     private PasswordCryptographyProvider cryptographyProvider;
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public AddressEntity createAddress(final String customerAccessToken, final AddressEntity addressEntity, final String stateUuid)
-            throws AuthorizationFailedException, SaveAddressException, AddressNotFoundException {
+    public AddressEntity saveAddress(final AddressEntity addressEntity, final CustomerEntity customerEntity)
+            throws AuthorizationFailedException, AddressNotFoundException {
 
-        CustomerAuthEntity customerAuthEntity =  checkAuthorization(customerAccessToken);
-
-        StateEntity state = addressDao.getStateDetails(stateUuid);
-        if(state==null){
-            throw new AddressNotFoundException("ANF-002", "No state by this id");
-        }
-
-        addressEntity.setState(state);
         AddressEntity createdAddress = addressDao.createNewAddress(addressEntity);
 
         CustomerAddressEntity customerAddressEntity = new CustomerAddressEntity();
-        customerAddressEntity.setCustomer(customerAuthEntity.getCustomer());
+        customerAddressEntity.setCustomer(customerEntity);
         customerAddressEntity.setAddress(createdAddress);
-
-        CustomerAddressEntity newrecord = addressDao.recordCustomerAddressEntity(customerAddressEntity);
+        addressDao.recordCustomerAddressEntity(customerAddressEntity);
 
         return createdAddress;
-
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
@@ -116,6 +106,18 @@ public class AddressService {
         addressDao.deleteAddress(address);
     }
 
+    //Get state details by UUID
+    public StateEntity getStateByUUID(final String stateUuid) throws AddressNotFoundException, SaveAddressException{
+
+        StateEntity stateEntity = addressDao.getStateDetails(stateUuid);
+        if(stateEntity == null){
+            throw new AddressNotFoundException("ANF-002","No state by this id");
+        }
+        else {
+            return stateEntity;
+        }
+    }
+
     @Transactional(propagation = Propagation.REQUIRED)
     public List<StateEntity> getAllStates(){
 
@@ -123,7 +125,6 @@ public class AddressService {
         return statesList;
 
     }
-
 
     private CustomerAuthEntity checkAuthorization(String customerAccessToken) throws AuthorizationFailedException{
 
@@ -146,6 +147,23 @@ public class AddressService {
         return customerAuthEntity;
     }
 
+    public String validatePincode(String pincode) throws SaveAddressException {
+        if(pincode.length() !=6)
+            throw new SaveAddressException("SAR-002", "Invalid pincode");
 
+        boolean allNumeric = true;
+
+        for(int i=0; i<pincode.length(); i++){
+            if(!((int)pincode.charAt(i) >=48 && (int)pincode.charAt(i)<=57)){
+                allNumeric = false;
+            }
+        }
+
+        if(allNumeric) {
+            return pincode;
+        } else {
+            throw new SaveAddressException("SAR-002", "Invalid pincode");
+        }
+    }
 
 }

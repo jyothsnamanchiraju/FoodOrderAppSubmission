@@ -12,6 +12,8 @@ import com.upgrad.FoodOrderingApp.service.businness.AddressService;
 import com.upgrad.FoodOrderingApp.api.model.SaveAddressRequest;
 import com.upgrad.FoodOrderingApp.api.model.SaveAddressResponse;
 
+import com.upgrad.FoodOrderingApp.service.businness.CustomerService;
+import com.upgrad.FoodOrderingApp.service.entity.CustomerEntity;
 import com.upgrad.FoodOrderingApp.service.exception.*;
 
 import com.upgrad.FoodOrderingApp.service.entity.AddressEntity;
@@ -43,14 +45,16 @@ public class AddressController {
     @Autowired
     private AddressService addressService;
 
-    @RequestMapping(method= RequestMethod.POST, path ="address", consumes=MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @Autowired
+    private CustomerService customerService;
+
+    @RequestMapping(method= RequestMethod.POST, path ="/address", consumes=MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<SaveAddressResponse> createCustomerAddress(@RequestHeader("authorization") final String authorization, final SaveAddressRequest saveAddressRequest)
             throws AuthorizationFailedException, SaveAddressException, AddressNotFoundException {
 
         String[] bearerToken = authorization.split("Bearer ");
         String customerAccessToken = bearerToken[1];
-
-        AddressEntity addressEntity = new AddressEntity();
+        CustomerEntity customerEntity = customerService.getCustomer(customerAccessToken);
 
         if(saveAddressRequest.getFlatBuildingName()== null || saveAddressRequest.getFlatBuildingName()==" "
                 || saveAddressRequest.getLocality() == null || saveAddressRequest.getLocality() == null
@@ -60,19 +64,23 @@ public class AddressController {
             throw new SaveAddressException("SAR-001", "No field can be empty");
         }
 
-        if(!validPincode(saveAddressRequest.getPincode())){
-            throw new SaveAddressException("SAR-002", "Invalid pincode");
-        }
+        String pinCode = addressService.validatePincode(saveAddressRequest.getPincode());
+        StateEntity stateEntity = addressService.getStateByUUID(saveAddressRequest.getStateUuid());
 
+        AddressEntity addressEntity = new AddressEntity();
         addressEntity.setUuid(UUID.randomUUID().toString());
         addressEntity.setFlatBuildingNumber(saveAddressRequest.getFlatBuildingName());
         addressEntity.setLocality(saveAddressRequest.getLocality());
         addressEntity.setCity(saveAddressRequest.getCity());
         addressEntity.setPincode(saveAddressRequest.getPincode());
-        String stateUuid = saveAddressRequest.getStateUuid();
+        addressEntity.setState(stateEntity);
+        addressEntity.setActive(1);
 
-        final AddressEntity addressCreated = addressService.createAddress(customerAccessToken, addressEntity, stateUuid);
-        SaveAddressResponse saveAddressResponse = new SaveAddressResponse().id(addressCreated.getUuid()).status("ADDRESS SUCCESSFULLY REGISTERED") ;
+        final AddressEntity addressCreated = addressService.saveAddress(addressEntity, customerEntity);
+        SaveAddressResponse saveAddressResponse = new SaveAddressResponse()
+                .id(addressCreated.getUuid())
+                .status("ADDRESS SUCCESSFULLY REGISTERED") ;
+
         return new ResponseEntity<SaveAddressResponse>(saveAddressResponse, HttpStatus.CREATED);
     }
 
@@ -150,19 +158,4 @@ public class AddressController {
         return new ResponseEntity<StatesListResponse>(statesListResponse, HttpStatus.OK);
     }
 
-
-    private boolean validPincode(String pincode){
-        if(pincode.length() !=6)
-            return false;
-
-        boolean allNumeric = true;
-
-        for(int i=0; i<pincode.length(); i++){
-            if(!((int)pincode.charAt(i) >=48 && (int)pincode.charAt(i)<=57)){
-                allNumeric = false;
-            }
-        }
-
-        return allNumeric;
-    }
 }
