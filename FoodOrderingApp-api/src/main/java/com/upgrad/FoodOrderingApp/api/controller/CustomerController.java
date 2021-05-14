@@ -21,10 +21,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpHeaders;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 import java.util.Base64;
@@ -37,11 +34,25 @@ public class CustomerController {
     private CustomerService customerService;
 
     @RequestMapping(method= RequestMethod.POST, path ="/customer/signup", consumes=MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<SignupCustomerResponse> signup(final SignupCustomerRequest signupCustomerRequest) throws SignUpRestrictedException{
+    public ResponseEntity<SignupCustomerResponse> signup(@RequestBody final SignupCustomerRequest signupCustomerRequest) throws SignUpRestrictedException{
 
         final CustomerEntity customerEntity = new CustomerEntity();
 
         customerEntity.setUuid(UUID.randomUUID().toString());
+        try {
+            signupCustomerRequest.getFirstName().isEmpty();
+            signupCustomerRequest.getEmailAddress().isEmpty();
+            signupCustomerRequest.getContactNumber().isEmpty();
+            signupCustomerRequest.getPassword().isEmpty();
+        } catch (Exception e) {
+            throw new SignUpRestrictedException("SGR-005", "Except last name all fields should be filled");
+        }
+
+        if(signupCustomerRequest.getFirstName().equals("") || signupCustomerRequest.getEmailAddress().equals("") ||
+        signupCustomerRequest.getContactNumber().equals("") || signupCustomerRequest.getPassword().equals("")) {
+            throw new SignUpRestrictedException("SGR-005", "Except last name all fields should be filled");
+        }
+
         customerEntity.setFirstName(signupCustomerRequest.getFirstName());
         customerEntity.setLastName(signupCustomerRequest.getLastName());
         customerEntity.setEmail(signupCustomerRequest.getEmailAddress());

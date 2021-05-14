@@ -116,19 +116,10 @@ public class CustomerService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     public CustomerEntity saveCustomer(CustomerEntity customerEntity)throws SignUpRestrictedException{
-
         //check if the contact_number already exists for another account
         CustomerEntity checkCustomer = customerDao.getCustomerByContactNumber(customerEntity.getContactNumber());
         if(checkCustomer !=null){
             throw new SignUpRestrictedException("SGR-001", "This contact number is already registered! Try other contact number.");
-        }
-
-        //check if all fields are filled
-        if(customerEntity.getFirstName() == null || customerEntity.getFirstName() == " " ||
-                customerEntity.getEmail() == null || customerEntity.getEmail() == " " ||
-                customerEntity.getContactNumber() == null || customerEntity.getContactNumber() == " " ||
-                customerEntity. getPassword() == null || customerEntity.getPassword()==" " ){
-            throw new SignUpRestrictedException("SGR-005", "Except last name all fields should be filled");
         }
 
         if(!checkEmail(customerEntity.getEmail())){
