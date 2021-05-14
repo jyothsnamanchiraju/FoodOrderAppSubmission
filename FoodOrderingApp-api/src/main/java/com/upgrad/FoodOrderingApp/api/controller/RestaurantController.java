@@ -48,7 +48,7 @@ public class RestaurantController {
             RestaurantDetailsResponseAddress responseAddress = new RestaurantDetailsResponseAddress()
                     .id(UUID.fromString(restaurantAddress.getUuid()))
                     .city(restaurantAddress.getCity())
-                    .flatBuildingName(restaurantAddress.getFlatBuildingNumber())
+                    .flatBuildingName(restaurantAddress.getFlatBuilNo())
                     .locality(restaurantAddress.getLocality())
                     .pincode(restaurantAddress.getPincode())
                     .state(responseAddressState);
@@ -92,7 +92,7 @@ public class RestaurantController {
             RestaurantDetailsResponseAddress responseAddress = new RestaurantDetailsResponseAddress()
                     .id(UUID.fromString(restaurantAddress.getUuid()))
                     .city(restaurantAddress.getCity())
-                    .flatBuildingName(restaurantAddress.getFlatBuildingNumber())
+                    .flatBuildingName(restaurantAddress.getFlatBuilNo())
                     .locality(restaurantAddress.getLocality())
                     .pincode(restaurantAddress.getPincode())
                     .state(responseAddressState);
@@ -138,7 +138,7 @@ public class RestaurantController {
             RestaurantDetailsResponseAddress responseAddress = new RestaurantDetailsResponseAddress()
                     .id(UUID.fromString(restaurantAddress.getUuid()))
                     .city(restaurantAddress.getCity())
-                    .flatBuildingName(restaurantAddress.getFlatBuildingNumber())
+                    .flatBuildingName(restaurantAddress.getFlatBuilNo())
                     .locality(restaurantAddress.getLocality())
                     .pincode(restaurantAddress.getPincode())
                     .state(responseAddressState);
@@ -182,7 +182,7 @@ public class RestaurantController {
         RestaurantDetailsResponseAddress responseAddress = new RestaurantDetailsResponseAddress()
                 .id(UUID.fromString(restaurantAddress.getUuid()))
                 .city(restaurantAddress.getCity())
-                .flatBuildingName(restaurantAddress.getFlatBuildingNumber())
+                .flatBuildingName(restaurantAddress.getFlatBuilNo())
                 .locality(restaurantAddress.getLocality())
                 .pincode(restaurantAddress.getPincode())
                 .state(responseAddressState);
