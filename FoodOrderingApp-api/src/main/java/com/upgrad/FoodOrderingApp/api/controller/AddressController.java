@@ -142,11 +142,11 @@ public class AddressController {
 
 
     @RequestMapping(method= RequestMethod.GET, path ="/states", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<StatesListResponse> getAllAddresses() {
+    public ResponseEntity<StatesListResponse> getAllStates() {
 
         List<StateEntity> listOfAllStates = addressService.getAllStates();
 
-        List<StatesList> statesList = new <StatesList> ArrayList();
+        List<StatesList> statesList = new ArrayList<>();
 
         for(StateEntity s: listOfAllStates){
             StatesList state = new StatesList();
@@ -156,7 +156,13 @@ public class AddressController {
         }
 
         StatesListResponse statesListResponse = new StatesListResponse();
-        statesListResponse.states(statesList);
+        if (statesList.size() != 0) {
+
+            statesListResponse.states(statesList);
+        } else {
+            statesListResponse.states(null);
+        }
+
         return new ResponseEntity<StatesListResponse>(statesListResponse, HttpStatus.OK);
     }
 

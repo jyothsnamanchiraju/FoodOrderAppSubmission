@@ -121,10 +121,7 @@ public class AddressService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     public List<StateEntity> getAllStates(){
-
-        List<StateEntity> statesList = addressDao.getAllStates();
-        return statesList;
-
+        return addressDao.getAllStates();
     }
 
     private CustomerEntity checkAuthorization(String customerAccessToken) throws AuthorizationFailedException{
