@@ -13,6 +13,7 @@ import com.upgrad.FoodOrderingApp.api.model.SaveAddressRequest;
 import com.upgrad.FoodOrderingApp.api.model.SaveAddressResponse;
 
 import com.upgrad.FoodOrderingApp.service.businness.CustomerService;
+import com.upgrad.FoodOrderingApp.service.dao.CustomerAddressDao;
 import com.upgrad.FoodOrderingApp.service.entity.CustomerEntity;
 import com.upgrad.FoodOrderingApp.service.exception.*;
 
@@ -123,17 +124,21 @@ public class AddressController {
     }
 
 
-    @RequestMapping(method= RequestMethod.DELETE, path ="address/{address_id}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(method= RequestMethod.DELETE, path ="/address/{address_id}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<DeleteAddressResponse> deleteAddress(@RequestHeader("authorization") final String authorization,
                                                                @PathVariable("address_id") final String addressUuid)
             throws AuthorizationFailedException, AddressNotFoundException {
 
         String[] bearerToken = authorization.split("Bearer ");
         String customerAccessToken = bearerToken[1];
+        CustomerEntity customerEntity = customerService.getCustomer(customerAccessToken);
+
+        final AddressEntity addressEntity = addressService.getAddressByUUID(addressUuid,customerEntity);
+        final String uuid = addressService.deleteAddress(addressEntity).getUuid();
 
         DeleteAddressResponse deleteAddressResponse = new DeleteAddressResponse();
-        addressService.deleteAddress(customerAccessToken, addressUuid);
-        deleteAddressResponse.id(UUID.fromString(addressUuid)).status("ADDRESS_DELETED");
+        addressService.deleteAddress(addressEntity);
+        deleteAddressResponse.id(UUID.fromString(uuid)).status("ADDRESS_DELETED");
         return new ResponseEntity<DeleteAddressResponse>(deleteAddressResponse, HttpStatus.OK);
 
     }
