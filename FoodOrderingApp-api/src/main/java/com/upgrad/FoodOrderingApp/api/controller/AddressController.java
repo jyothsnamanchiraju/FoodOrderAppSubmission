@@ -70,7 +70,7 @@ public class AddressController {
 
         AddressEntity addressEntity = new AddressEntity();
         addressEntity.setUuid(UUID.randomUUID().toString());
-        addressEntity.setFlatBuildingNumber(saveAddressRequest.getFlatBuildingName());
+        addressEntity.setFlatBuilNo(saveAddressRequest.getFlatBuildingName());
         addressEntity.setLocality(saveAddressRequest.getLocality());
         addressEntity.setCity(saveAddressRequest.getCity());
         addressEntity.setPincode(saveAddressRequest.getPincode());
@@ -92,24 +92,21 @@ public class AddressController {
 
         String[] bearerToken = authorization.split("Bearer ");
         String customerAccessToken = bearerToken[1];
+        CustomerEntity customerEntity = customerService.getCustomer(customerAccessToken);
 
         List<AddressList> listOfAddresses = new <AddressList> ArrayList();
-        List<AddressEntity> customerAddressList = new<AddressEntity> ArrayList();
-
-        customerAddressList = addressService.getAddressList(customerAccessToken);
+        List<AddressEntity> customerAddressList = addressService.getAllAddress(customerEntity);
 
         for(AddressEntity addr: customerAddressList){
             AddressList customerAddress = new AddressList();
-            StateEntity state = new StateEntity();
-            AddressListState aState = new AddressListState();
-            //UUID. fromString(uuidAsString);
             customerAddress.setId(UUID.fromString(addr.getUuid()));
-            customerAddress.setFlatBuildingName(addr.getFlatBuildingNumber());
+            customerAddress.setFlatBuildingName(addr.getFlatBuilNo());
             customerAddress.setLocality(addr.getLocality());
             customerAddress.setCity(addr.getCity());
             customerAddress.setPincode(addr.getPincode());
 
-            state= addr.getState();
+            StateEntity state = addr.getState();
+            AddressListState aState = new AddressListState();
             aState.setId(UUID.fromString(state.getUuid()));
             aState.setStateName(state.getStateName());
 

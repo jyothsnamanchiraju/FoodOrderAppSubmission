@@ -80,23 +80,19 @@ public class AddressService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public List<AddressEntity> getAddressList(String customerAccessToken) throws AuthorizationFailedException{
+    public List<AddressEntity> getAllAddress(final CustomerEntity customerEntity) {
 
-        CustomerAuthEntity customerAuthEntity =  checkAuthorization(customerAccessToken);
-        CustomerEntity customer = customerAuthEntity.getCustomer();
-
-        List<CustomerAddressEntity> customerAddressList = new <CustomerAddressEntity> ArrayList();
-        customerAddressList = addressDao.getAllAddresses(customer);
+        List<CustomerAddressEntity> customerAddressList = addressDao.getAllAddresses(customerEntity);
 
         List<AddressEntity> addresses = new <AddressEntity> ArrayList();
 
         for(CustomerAddressEntity c: customerAddressList){
-            AddressEntity address = new AddressEntity();
             Integer addrId = c.getAddress().getId();
-            address = addressDao.getAddressById(addrId);
+            AddressEntity address = addressDao.getAddressById(addrId);
 
             addresses.add(address);
         }
+
         return addresses;
     }
 

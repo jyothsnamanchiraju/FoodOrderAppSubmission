@@ -13,7 +13,7 @@ import java.io.Serializable;
 
 @NamedQueries(
         {
-                @NamedQuery(name = "getAddressById", query = "select a from AddressEntity a  where a.id = :id order by id desc"),
+                @NamedQuery(name = "getAddressById", query = "select a from AddressEntity a  where a.id = :id order by a.id desc"),
                 @NamedQuery(name = "getAddressByUuId", query = "select a from AddressEntity a  where a.uuid = :uuid")
         }
 )
@@ -69,11 +69,11 @@ public class AddressEntity implements Serializable {
         this.uuid = uuid;
     }
 
-    public String getFlatBuildingNumber() {
+    public String getFlatBuilNo() {
         return flatBuildingNumber;
     }
 
-    public void setFlatBuildingNumber(String flatBuildingNumber) {
+    public void setFlatBuilNo(String flatBuildingNumber) {
         this.flatBuildingNumber = flatBuildingNumber;
     }
 
