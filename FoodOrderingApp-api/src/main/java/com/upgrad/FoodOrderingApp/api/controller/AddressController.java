@@ -50,7 +50,7 @@ public class AddressController {
             @RequestBody(required = false) final SaveAddressRequest saveAddressRequest,
             @RequestHeader("authorization") final String authorization)
             throws AuthorizationFailedException, SaveAddressException, AddressNotFoundException {
-        System.out.println(saveAddressRequest);
+
         String[] bearerToken = authorization.split("Bearer ");
         String customerAccessToken = bearerToken[1];
 
@@ -122,8 +122,9 @@ public class AddressController {
 
 
     @RequestMapping(method= RequestMethod.DELETE, path ="/address/{address_id}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<DeleteAddressResponse> deleteAddress(@RequestHeader("authorization") final String authorization,
-                                                               @PathVariable("address_id") final String addressUuid)
+    public ResponseEntity<DeleteAddressResponse> deleteAddress(
+            @RequestHeader("authorization") final String authorization,
+            @PathVariable("address_id") final String addressUuid)
             throws AuthorizationFailedException, AddressNotFoundException {
 
         String[] bearerToken = authorization.split("Bearer ");
@@ -134,8 +135,7 @@ public class AddressController {
         final String uuid = addressService.deleteAddress(addressEntity).getUuid();
 
         DeleteAddressResponse deleteAddressResponse = new DeleteAddressResponse();
-        addressService.deleteAddress(addressEntity);
-        deleteAddressResponse.id(UUID.fromString(uuid)).status("ADDRESS_DELETED");
+        deleteAddressResponse.id(UUID.fromString(uuid)).status("ADDRESS DELETED SUCCESSFULLY");
         return new ResponseEntity<DeleteAddressResponse>(deleteAddressResponse, HttpStatus.OK);
 
     }
