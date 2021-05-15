@@ -40,6 +40,23 @@ public class AddressService {
     @Transactional(propagation = Propagation.REQUIRED)
     public AddressEntity saveAddress(final AddressEntity addressEntity, final CustomerEntity customerEntity)
             throws SaveAddressException {
+        try{
+            addressEntity.getFlatBuilNo().isEmpty();
+            addressEntity.getLocality().isEmpty();
+            addressEntity.getCity().isEmpty();
+            addressEntity.getPincode().isEmpty();
+            addressEntity.getState().getUuid().isEmpty();
+        } catch(Exception e) {
+            throw new SaveAddressException("SAR-001", "No field can be empty.");
+        }
+
+        if(addressEntity.getFlatBuilNo().isEmpty()
+                || addressEntity.getLocality().isEmpty()
+                || addressEntity.getCity().isEmpty()
+                || addressEntity.getPincode().isEmpty()
+                || addressEntity.getUuid().isEmpty()){
+            throw new SaveAddressException("SAR-001", "No field can be empty.");
+        }
 
         validatePincode(addressEntity.getPincode());
         AddressEntity createdAddress = addressDao.createNewAddress(addressEntity);

@@ -56,16 +56,6 @@ public class AddressController {
 
         CustomerEntity customerEntity = customerService.getCustomer(customerAccessToken);
 
-        try {
-            saveAddressRequest.getFlatBuildingName().isEmpty();
-            saveAddressRequest.getLocality().isEmpty();
-            saveAddressRequest.getCity().isEmpty();
-            saveAddressRequest.getPincode().isEmpty();
-            saveAddressRequest.getStateUuid().isEmpty();
-        } catch (Exception e) {
-            throw new SaveAddressException("SAR-001", "No field can be empty");
-        }
-
         StateEntity stateEntity = addressService.getStateByUUID(saveAddressRequest.getStateUuid());
 
         AddressEntity addressEntity = new AddressEntity();
