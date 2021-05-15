@@ -4,6 +4,7 @@ import com.upgrad.FoodOrderingApp.service.dao.RestaurantDao;
 import com.upgrad.FoodOrderingApp.service.entity.*;
 import com.upgrad.FoodOrderingApp.service.exception.AuthorizationFailedException;
 import com.upgrad.FoodOrderingApp.service.exception.CategoryNotFoundException;
+import com.upgrad.FoodOrderingApp.service.exception.InvalidRatingException;
 import com.upgrad.FoodOrderingApp.service.exception.RestaurantNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,7 +21,11 @@ public class RestaurantService {
         return restaurantDao.getAllRestaurant();
     }
 
-    public List<RestaurantEntity> restaurantsByName(String restaurantName){
+    public List<RestaurantEntity> restaurantsByName(String restaurantName) throws RestaurantNotFoundException {
+
+        if(restaurantName.equals("")) {
+            throw new RestaurantNotFoundException("RNF-003", "Restaurant name field should not be empty");
+        }
         return restaurantDao.getRestaurantsByName(restaurantName);
     }
 
@@ -77,9 +82,13 @@ public class RestaurantService {
         return restaurantDao.restaurantsByRating();
     }
 
-    public RestaurantEntity updateRestaurantRating(RestaurantEntity restaurant, Double rating) {
-        Double ratingIndex = (restaurant.getCustomerRating()*restaurant.getNumberCustomersRated());
+    public RestaurantEntity updateRestaurantRating(RestaurantEntity restaurant, Double rating) throws InvalidRatingException {
 
+        if(rating<1 || rating>5){
+            throw new InvalidRatingException("IRE-001", "Restaurant should be in the range of 1 to 5");
+        }
+
+        Double ratingIndex = (restaurant.getCustomerRating()*restaurant.getNumberCustomersRated());
 
         restaurant.setNumberCustomersRated(restaurant.getNumberCustomersRated()+1);
 
