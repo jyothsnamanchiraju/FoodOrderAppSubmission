@@ -37,6 +37,7 @@ public class RestaurantController {
     @Autowired
     private ItemService itemService;
 
+    @CrossOrigin
     @GetMapping(path = "/restaurant")
     @ResponseBody
     public ResponseEntity<RestaurantListResponse> getRestaurants(){
@@ -74,6 +75,7 @@ public class RestaurantController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @CrossOrigin
     @GetMapping(path = "/restaurant/name/{restaurant_name}")
     @ResponseBody
     public ResponseEntity<RestaurantListResponse> getRestaurantsByName(@PathVariable(value = "restaurant_name") String restaurantName) throws RestaurantNotFoundException {
@@ -117,6 +119,7 @@ public class RestaurantController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @CrossOrigin
     @GetMapping(path = "/restaurant/category/{category_id}")
     @ResponseBody
     public ResponseEntity<RestaurantListResponse> getRestaurantByCategory(@PathVariable(value = "category_id") String categoryId) throws CategoryNotFoundException {
@@ -161,6 +164,7 @@ public class RestaurantController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @CrossOrigin
     @GetMapping(path = "/api/restaurant/{restaurant_id}")
     @ResponseBody
     public ResponseEntity<RestaurantDetailsResponse> getRestaurantById(@PathVariable(value = "restaurant_id", required = false) String restaurantId) throws RestaurantNotFoundException {
@@ -214,6 +218,7 @@ public class RestaurantController {
 
     }
 
+    @CrossOrigin
     @PutMapping(path = "/api/restaurant/{restaurant_id}")
     @ResponseBody
     public ResponseEntity<RestaurantUpdatedResponse> updateRestaurant(

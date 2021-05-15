@@ -45,6 +45,7 @@ public class AddressController {
     @Autowired
     private CustomerService customerService;
 
+    @CrossOrigin
     @RequestMapping(method= RequestMethod.POST, path ="/address", consumes=MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<SaveAddressResponse> createCustomerAddress(
             @RequestBody(required = false) final SaveAddressRequest saveAddressRequest,
@@ -75,7 +76,7 @@ public class AddressController {
         return new ResponseEntity<SaveAddressResponse>(saveAddressResponse, HttpStatus.CREATED);
     }
 
-
+    @CrossOrigin
     @RequestMapping(method= RequestMethod.GET, path ="/address/customer", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<AddressListResponse> getAllAddresses(@RequestHeader("authorization") final String authorization)
             throws AuthorizationFailedException {
@@ -110,7 +111,7 @@ public class AddressController {
 
     }
 
-
+    @CrossOrigin
     @RequestMapping(method= RequestMethod.DELETE, path ="/address/{address_id}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<DeleteAddressResponse> deleteAddress(
             @RequestHeader("authorization") final String authorization,
@@ -130,7 +131,7 @@ public class AddressController {
 
     }
 
-
+    @CrossOrigin
     @RequestMapping(method= RequestMethod.GET, path ="/states", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<StatesListResponse> getAllStates() {
 

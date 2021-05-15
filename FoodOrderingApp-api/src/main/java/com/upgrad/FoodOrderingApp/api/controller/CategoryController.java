@@ -12,10 +12,7 @@ import com.upgrad.FoodOrderingApp.service.exception.CategoryNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -26,6 +23,7 @@ public class CategoryController {
     @Autowired
     private CategoryService categoryService;
 
+    @CrossOrigin
     @GetMapping(path = "/category")
     @ResponseBody
     public ResponseEntity<CategoriesListResponse> getCategories () throws CategoryNotFoundException {
@@ -41,6 +39,7 @@ public class CategoryController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @CrossOrigin
     @GetMapping(path = "/category/{category_id}")
     @ResponseBody
     public ResponseEntity<CategoryDetailsResponse> getCategoriesById (@PathVariable(value = "category_id", required = false) String categoryId) throws CategoryNotFoundException {
