@@ -3,6 +3,7 @@ package com.upgrad.FoodOrderingApp.api.controller;
 import com.upgrad.FoodOrderingApp.api.model.*;
 import com.upgrad.FoodOrderingApp.service.businness.CategoryService;
 import com.upgrad.FoodOrderingApp.service.businness.CustomerService;
+import com.upgrad.FoodOrderingApp.service.businness.ItemService;
 import com.upgrad.FoodOrderingApp.service.businness.RestaurantService;
 import com.upgrad.FoodOrderingApp.service.entity.*;
 import com.upgrad.FoodOrderingApp.service.exception.AuthorizationFailedException;
@@ -30,6 +31,11 @@ public class RestaurantController {
     @Autowired
     private CategoryService categoryService;
 
+    @Autowired
+    private CustomerService customerService;
+
+    @Autowired
+    private ItemService itemService;
 
     @GetMapping(path = "/restaurant")
     @ResponseBody
@@ -163,21 +169,18 @@ public class RestaurantController {
             throw new RestaurantNotFoundException("RNF-002", "Restaurant id field should not be empty");
         }
 
-        RestaurantEntity restaurant = restaurantService.getrestaurantById(restaurantId);
-
-        AddressEntity restaurantAddress = restaurantService.getRestaurantAddress(restaurant.getId());
-
-        StateEntity state = restaurantService.getRestaurantState(restaurantAddress.getId());
+        RestaurantEntity restaurant = restaurantService.restaurantByUUID(restaurantId);
 
         RestaurantDetailsResponseAddressState responseAddressState = new RestaurantDetailsResponseAddressState()
-                .stateName(state.getStateName())
-                .id(UUID.fromString(state.getUuid()));
+                .stateName(restaurant.getAddress().getState().getStateName())
+                .id(UUID.fromString(restaurant.getAddress().getState().getUuid()));
+
         RestaurantDetailsResponseAddress responseAddress = new RestaurantDetailsResponseAddress()
-                .id(UUID.fromString(restaurantAddress.getUuid()))
-                .city(restaurantAddress.getCity())
-                .flatBuildingName(restaurantAddress.getFlatBuilNo())
-                .locality(restaurantAddress.getLocality())
-                .pincode(restaurantAddress.getPincode())
+                .id(UUID.fromString(restaurant.getAddress().getUuid()))
+                .city(restaurant.getAddress().getCity())
+                .flatBuildingName(restaurant.getAddress().getFlatBuilNo())
+                .locality(restaurant.getAddress().getLocality())
+                .pincode(restaurant.getAddress().getPincode())
                 .state(responseAddressState);
 
         RestaurantDetailsResponse response = new RestaurantDetailsResponse()
@@ -189,10 +192,10 @@ public class RestaurantController {
                 .numberCustomersRated(restaurant.getNumberCustomersRated())
                 .address(responseAddress);
 
-        List<CategoryEntity> categories = categoryService.getCategoriesByRestaurant(restaurant.getUuid());
+        List<CategoryEntity> categories = categoryService.getCategoriesByRestaurant(restaurantId);
 
         for(CategoryEntity category:categories) {
-            List<ItemEntity> items = restaurantService.getItemsOnCategory(restaurant.getId(), category.getId());
+            List<ItemEntity> items = itemService.getItemsByCategoryAndRestaurant(restaurantId, category.getUuid());
             CategoryList categoryList = new CategoryList()
                     .id(UUID.fromString(category.getUuid()))
                     .categoryName(category.getCategoryName());
@@ -200,7 +203,7 @@ public class RestaurantController {
 
                 categoryList.addItemListItem(new ItemList()
                         .id(UUID.fromString(item.getUuid()))
-                        .itemType(ItemList.ItemTypeEnum.fromValue(Integer.parseInt(item.getType())==0?"VEG":"NON_VEG"))
+                        .itemType(ItemList.ItemTypeEnum.fromValue(item.getType().equals("0") ? "VEG":"NON_VEG"))
                         .price(item.getPrice())
                         .itemName(item.getItemName()));
             }
@@ -213,21 +216,25 @@ public class RestaurantController {
 
     @PutMapping(path = "/api/restaurant/{restaurant_id}")
     @ResponseBody
-    public ResponseEntity<RestaurantUpdatedResponse> updateRestaurant(@RequestHeader("authorization") final String authorization, @PathVariable(value = "restaurant_id", required = false) String restaurantId, @RequestParam(value = "CustomerRating") Double rating) throws AuthorizationFailedException, RestaurantNotFoundException, InvalidRatingException {
+    public ResponseEntity<RestaurantUpdatedResponse> updateRestaurant(
+            @RequestHeader("authorization") final String authorization,
+            @PathVariable(value = "restaurant_id", required = false) String restaurantId,
+            @RequestParam(value = "customer_rating") Double rating)
+            throws AuthorizationFailedException, RestaurantNotFoundException, InvalidRatingException {
 
         String[] auth = authorization.split(" ");
-        restaurantService.authorize(auth[1]);
+        customerService.getCustomer(auth[1]);
 
         if(restaurantId.isEmpty() || restaurantId.equals(null)){
             throw new RestaurantNotFoundException("RNF-002", "Restaurant id field should not be empty");
         }
 
-        RestaurantEntity restaurant = restaurantService.getrestaurantById(restaurantId);
+        RestaurantEntity restaurant = restaurantService.restaurantByUUID(restaurantId);
 
         RestaurantEntity result = restaurantService.updateRestaurantRating(restaurant, rating);
 
         RestaurantUpdatedResponse response = new RestaurantUpdatedResponse()
-                .id(UUID.fromString(result.getUuid()))
+                .id(UUID.fromString(restaurantId))
                 .status("RESTAURANT RATING UPDATED SUCCESSFULLY");
 
         return new ResponseEntity<>(response, HttpStatus.OK);

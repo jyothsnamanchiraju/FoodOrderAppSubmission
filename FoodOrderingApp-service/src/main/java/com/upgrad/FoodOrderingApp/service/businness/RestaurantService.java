@@ -82,9 +82,9 @@ public class RestaurantService {
         return restaurantDao.restaurantsByRating();
     }
 
-    public RestaurantEntity updateRestaurantRating(RestaurantEntity restaurant, Double rating) throws InvalidRatingException {
+    public RestaurantEntity updateRestaurantRating(RestaurantEntity restaurant, Double CustomerRating) throws InvalidRatingException {
 
-        if(rating<1 || rating>5){
+        if(CustomerRating<1 || CustomerRating>5){
             throw new InvalidRatingException("IRE-001", "Restaurant should be in the range of 1 to 5");
         }
 
@@ -92,7 +92,7 @@ public class RestaurantService {
 
         restaurant.setNumberCustomersRated(restaurant.getNumberCustomersRated()+1);
 
-        restaurant.setCustomerRating((ratingIndex+rating)/restaurant.getNumberCustomersRated());
+        restaurant.setCustomerRating((ratingIndex+CustomerRating)/restaurant.getNumberCustomersRated());
         return restaurantDao.updateRatings(restaurant);
     }
 
