@@ -14,7 +14,7 @@ public class CategoryService {
     @Autowired
     private CategoryDao categoryDao;
 
-    public List<CategoryEntity> getAllCategories() throws CategoryNotFoundException {
+    public List<CategoryEntity> getAllCategoriesOrderedByName() throws CategoryNotFoundException {
         List<CategoryEntity> result = categoryDao.getAllCategory();
         if(result==null){
             throw new CategoryNotFoundException("CNF-002", "Category doesn't exist");
@@ -22,7 +22,7 @@ public class CategoryService {
         return result;
     }
 
-    public CategoryEntity getCategory(String uuid) throws CategoryNotFoundException {
+    public CategoryEntity getCategoryById(String uuid) throws CategoryNotFoundException {
         CategoryEntity result = categoryDao.getCategoryById(uuid);
 
         if(result==null){

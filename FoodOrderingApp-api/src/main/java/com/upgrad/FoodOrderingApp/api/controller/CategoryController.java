@@ -26,14 +26,11 @@ public class CategoryController {
     @Autowired
     private CategoryService categoryService;
 
-    @Autowired
-    private ItemService itemService;
-
     @GetMapping(path = "/category")
     @ResponseBody
     public ResponseEntity<CategoriesListResponse> getCategories () throws CategoryNotFoundException {
 
-        List<CategoryEntity> result = categoryService.getAllCategories();
+        List<CategoryEntity> result = categoryService.getAllCategoriesOrderedByName();
 
         CategoriesListResponse response = new CategoriesListResponse();
 
@@ -52,23 +49,20 @@ public class CategoryController {
             throw new CategoryNotFoundException("CNF-001", "Category id field should not be empty");
         }
 
-        CategoryEntity result = categoryService.getCategory(categoryId);
-
-        List<ItemEntity> items = itemService.getItemsByCategory(result.getId());
-
+        CategoryEntity result = categoryService.getCategoryById(categoryId);
 
         CategoryDetailsResponse response = new CategoryDetailsResponse()
                                             .id(UUID.fromString(result.getUuid()))
                                             .categoryName(result.getCategoryName());
-        for(ItemEntity item:items){
-            ItemList.ItemTypeEnum itemType = ItemList.ItemTypeEnum.fromValue(Integer.parseInt(item.getType())==0?"VEG":"NON_VEG");
+
+        for(ItemEntity item : result.getItems()){
+            ItemList.ItemTypeEnum itemType = ItemList.ItemTypeEnum.fromValue(item.getType().equals("0")?"VEG":"NON_VEG");
             response.addItemListItem(new ItemList().itemName(item.getItemName())
                     .itemType(itemType)
                     .id(UUID.fromString(item.getUuid()))
                     .price(item.getPrice())
             );
         }
-
 
         return new ResponseEntity<CategoryDetailsResponse>(response, HttpStatus.OK);
     }

@@ -16,7 +16,7 @@ public class ItemDao {
 
     public List<ItemEntity> getItemsforCategory(Integer categoryId){
         try{
-            return entityManager.createNativeQuery("select i.* from item i inner join (select ci.* from category_item ci where ci.category_id = ?) c on i.id = c.item_id", ItemEntity.class)
+            return entityManager.createNativeQuery("select i.* from item i inner join (select ci.* from category_item ci where ci.category_id is ?) c on i.id = c.item_id", ItemEntity.class)
                     .setParameter(1, categoryId).getResultList();
         }
         catch(NoResultException exception) {
