@@ -34,6 +34,9 @@ public class OrderController {
     @Autowired
     private RestaurantService restaurantService;
 
+    @Autowired
+    private AddressService addressService;
+
     //Get coupon by coupon name
     @CrossOrigin
     @RequestMapping(method = RequestMethod.GET, path = "/order/coupon/{coupon_name}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -65,7 +68,7 @@ public class OrderController {
             @RequestHeader("authorization") final String authorization)
             throws AuthorizationFailedException {
         String[] bearerToken = authorization.split("Bearer "); //splitting authorization string to get access token
-        CustomerEntity customerEntity = orderService.authenticateByAccessToken(bearerToken[1]);
+        CustomerEntity customerEntity = customerService.getCustomer(bearerToken[1]);
 
         // Get all orders by customer
         List<OrdersEntity> orderEntityList = orderService.getOrdersByCustomers(customerEntity.getUuid());
@@ -151,32 +154,38 @@ public class OrderController {
     @CrossOrigin
     @RequestMapping(method = RequestMethod.POST, path = "/order", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<SaveOrderResponse> saveOrder(
-            final SaveOrderRequest saveOrderRequest,
+            @RequestBody final SaveOrderRequest saveOrderRequest,
             @RequestHeader("authorization") final String authorization)
             throws AuthorizationFailedException, CouponNotFoundException,
             AddressNotFoundException, PaymentMethodNotFoundException,
             RestaurantNotFoundException, ItemNotFoundException, SaveOrderException {
 
         String[] bearerToken = authorization.split("Bearer "); //splitting authorization string to get access token
-        CustomerEntity customerEntity = orderService.authenticateByAccessToken(bearerToken[1]);
+        CustomerEntity customerEntity = customerService.getCustomer(bearerToken[1]);
 
         /* Ensuring no fields are empty except coupon_id and discount
          * Included this logic considering that not all orders will have a coupon_id and discount
          * but other values are required
         */
-        if(saveOrderRequest.getAddressId() == null || saveOrderRequest.getItemQuantities().get(0).getItemId() == null ||
-                saveOrderRequest.getItemQuantities().get(0).getPrice() == null ||
-                saveOrderRequest.getItemQuantities().get(0).getQuantity() == null ||
-                saveOrderRequest.getRestaurantId() == null || saveOrderRequest.getPaymentId() == null ||
-                saveOrderRequest.getBill() == null){
+        if(saveOrderRequest.getAddressId() == null
+                || saveOrderRequest.getItemQuantities().get(0).getItemId() == null
+                || saveOrderRequest.getItemQuantities().get(0).getPrice() == null
+                || saveOrderRequest.getItemQuantities().get(0).getQuantity() == null
+                || saveOrderRequest.getRestaurantId() == null
+                || saveOrderRequest.getPaymentId() == null
+                || saveOrderRequest.getBill() == null){
             throw new SaveOrderException("SOR-001","No field should be empty except Coupon_Id and discount");
         }
 
         final OrdersEntity orderEntity = new OrdersEntity();
         orderEntity.setUuid(UUID.randomUUID().toString());
 
+        CouponEntity couponByCouponId = orderService.getCouponByCouponId(saveOrderRequest.getCouponId().toString());
+        PaymentEntity payment = paymentService.getPaymentByUUID(saveOrderRequest.getPaymentId().toString());
+        AddressEntity tempAddressEntity = addressService.getAddressByUUID(saveOrderRequest.getAddressId(), customerEntity);
+
         if(saveOrderRequest.getCouponId() != null) {
-            orderEntity.setCoupon(orderService.getCouponByCouponId(saveOrderRequest.getCouponId().toString()));
+            orderEntity.setCoupon(couponByCouponId);
         }
 
         /* Allowing null value for discount
@@ -190,12 +199,9 @@ public class OrderController {
         }
 
         orderEntity.setCustomer(customerEntity);
-        CustomerEntity loggedInCustomer = customerEntity;
-
-        AddressEntity tempAddressEntity = orderService.getAddressByUUID(saveOrderRequest.getAddressId(), loggedInCustomer);
 
         orderEntity.setAddress(tempAddressEntity);
-        orderEntity.setPayment(paymentService.getPaymentByUUID(saveOrderRequest.getPaymentId().toString()));
+        orderEntity.setPayment(payment);
         orderEntity.setRestaurant(restaurantService.restaurantByUUID(saveOrderRequest.getRestaurantId().toString()));
         orderEntity.setDate(new Date());
         orderEntity.setBill(saveOrderRequest.getBill().doubleValue());
