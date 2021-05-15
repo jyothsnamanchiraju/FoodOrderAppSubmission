@@ -71,7 +71,7 @@ public class OrderController {
         CustomerEntity customerEntity = customerService.getCustomer(bearerToken[1]);
 
         // Get all orders by customer
-        List<OrdersEntity> orderEntityList = orderService.getOrdersByCustomers(customerEntity);
+        List<OrdersEntity> orderEntityList = orderService.getOrdersByCustomers(customerEntity.getUuid());
 
         // Create response
         CustomerOrderResponse customerOrderResponse = new CustomerOrderResponse();
