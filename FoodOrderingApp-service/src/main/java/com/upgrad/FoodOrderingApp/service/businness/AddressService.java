@@ -141,27 +141,6 @@ public class AddressService {
         return addressDao.getAllStates();
     }
 
-    private CustomerEntity checkAuthorization(String customerAccessToken) throws AuthorizationFailedException{
-
-        CustomerAuthEntity customerAuthEntity = customerDao.getCustomerAuthByToken(customerAccessToken);
-
-
-        if(customerAuthEntity == null) {
-            throw new AuthorizationFailedException("ATHR-001","Customer is not Logged in.");
-        }
-        if(customerAuthEntity.getLogoutAt() != null){
-            throw new AuthorizationFailedException("ATHR-002","Customer is logged out. Log in again to access this endpoint.");
-        }
-
-        final ZonedDateTime now = ZonedDateTime.now();
-
-        if((customerAuthEntity.getExpiresAt().compareTo(now)) < 0){
-            throw new AuthorizationFailedException("ATHR-003","Your session is expired. Log in again to access this endpoint.");
-        }
-
-        return customerAuthEntity.getCustomer();
-    }
-
     public String validatePincode(String pincode) throws SaveAddressException {
         if(pincode.length() !=6)
             throw new SaveAddressException("SAR-002", "Invalid pincode");

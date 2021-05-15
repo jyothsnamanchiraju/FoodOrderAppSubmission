@@ -26,21 +26,6 @@ public class ItemService {
     @Autowired
     private CategoryDao categoryDao;
 
-    public List<ItemEntity> getItemsByCategory(Integer categoryId) {
-
-        return itemDao.getItemsforCategory(categoryId);
-    }
-
-    public List<ItemEntity> getTopItems(String restaurantId) throws RestaurantNotFoundException {
-        RestaurantEntity restaurant = restaurantDao.getRestaurantById(restaurantId);
-
-        if(restaurant.equals(null)){
-            throw new RestaurantNotFoundException("RNF-001", "No restaurant by this id");
-        }
-
-        return itemDao.getTopItems(restaurant.getId());
-    }
-
     public List<OrderItemEntity> getItemsByOrder(OrdersEntity orderEntity) {
         return orderItemDao.getItemsByOrder(orderEntity);
     }

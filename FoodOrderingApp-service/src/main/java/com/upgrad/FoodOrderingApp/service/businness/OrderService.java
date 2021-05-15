@@ -32,26 +32,6 @@ public class OrderService {
     @Autowired
     private OrderItemDao orderItemDao;
 
-    @Transactional(propagation = Propagation.REQUIRED)
-    public CustomerEntity authenticateByAccessToken(final String accessToken) throws AuthorizationFailedException {
-        CustomerAuthEntity customerAuthEntity = customerDao.getCustomerAuthByToken(accessToken);
-
-        if(customerAuthEntity == null) {
-            throw new AuthorizationFailedException("ATHR-001","Customer is not Logged in.");
-        }
-        if(customerAuthEntity.getLogoutAt() != null) {
-            throw new AuthorizationFailedException("ATHR-002","Customer is logged out. Log in again to access this endpoint.");
-        }
-
-        final ZonedDateTime now = ZonedDateTime.now();
-
-        if((customerAuthEntity.getExpiresAt().compareTo(now)) < 0){
-            throw new AuthorizationFailedException("ATHR-003","Your session is expired. Log in again to access this endpoint.");
-        }
-
-        return customerAuthEntity.getCustomer();
-    }
-
     public CouponEntity getCouponByCouponName(final String couponName) throws CouponNotFoundException {
         if (couponName.equals("")) {
             throw new CouponNotFoundException("CPF-002", "Coupon name field should not be empty");
@@ -78,27 +58,6 @@ public class OrderService {
             throw new CouponNotFoundException("CPF-001", "No coupon by this id");
         }
         return couponEntity;
-    }
-
-    public AddressEntity getAddressByUUID(final String addressUuid, final CustomerEntity customerEntity)
-            throws AuthorizationFailedException, AddressNotFoundException {
-
-        AddressEntity addressEntity = addressDao.getAddressByUuid(addressUuid);
-      //  AddressEntity addressEntity = addressDao.getAddressByAddressUuid(addressUuid);
-        //if address id is incorrect and no such address exist in database
-        if(addressEntity == null){
-            throw new AddressNotFoundException("ANF-003", "No address by this id");
-        }
-        else {
-            final CustomerAddressEntity customerAddressEntity = customerAddressDao.getCustomerAddressByAddressId(addressEntity);
-            final CustomerEntity belongsToAddressEntity = customerAddressEntity.getCustomer();
-            if(!belongsToAddressEntity.getUuid().equals(customerEntity.getUuid())){
-                throw new AuthorizationFailedException("ATHR-004", "You are not authorized to view/update/delete any one else's address ");
-            }
-            else {
-                return addressEntity;
-            }
-        }
     }
 
     //Creating/Saving new order by customer

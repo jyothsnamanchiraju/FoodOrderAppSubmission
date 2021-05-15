@@ -40,10 +40,6 @@ public class CategoryService {
 
     }
 
-    public List<CategoryEntity> getCategoriesForRestaurant(Integer id) {
-        return categoryDao.getCategoryForRestaurant(id);
-    }
-
     //List all categories mapped to a restaurant - list by restaurant UUID
     public List<CategoryEntity> getCategoriesByRestaurant(String restaurantUUID) {
         RestaurantEntity restaurantEntity = restaurantDao.getRestaurantByUUID(restaurantUUID);
