@@ -87,19 +87,19 @@ public class RestaurantEntity implements Serializable {
         this.customerRating = customerRating;
     }
 
-    public Integer getAveragePriceForTwo() {
+    public Integer getAvgPrice() {
         return averagePriceForTwo;
     }
 
-    public void setAveragePriceForTwo(Integer averagePriceForTwo) {
+    public void setAvgPrice(Integer averagePriceForTwo) {
         this.averagePriceForTwo = averagePriceForTwo;
     }
 
-    public Integer getNumberOfCustomersRated() {
+    public Integer getNumberCustomersRated() {
         return numberOfCustomersRated;
     }
 
-    public void setNumberOfCustomersRated(Integer numberOfCustomersRated) {
+    public void setNumberCustomersRated(Integer numberOfCustomersRated) {
         this.numberOfCustomersRated = numberOfCustomersRated;
     }
 

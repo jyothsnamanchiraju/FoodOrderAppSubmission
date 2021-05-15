@@ -60,8 +60,8 @@ public class RestaurantController {
                     .restaurantName(restaurant.getRestaurantName())
                     .photoURL(restaurant.getPhotoUrl())
                     .customerRating( new BigDecimal(restaurant.getCustomerRating(), MathContext.DECIMAL64))
-                    .averagePrice(restaurant.getAveragePriceForTwo())
-                    .numberCustomersRated(restaurant.getNumberOfCustomersRated())
+                    .averagePrice(restaurant.getAvgPrice())
+                    .numberCustomersRated(restaurant.getNumberCustomersRated())
                     .address(responseAddress)
                     .categories(categoryString)
             );
@@ -106,8 +106,8 @@ public class RestaurantController {
                             .restaurantName(restaurant.getRestaurantName())
                             .photoURL(restaurant.getPhotoUrl())
                             .customerRating( new BigDecimal(restaurant.getCustomerRating(), MathContext.DECIMAL64))
-                            .averagePrice(restaurant.getAveragePriceForTwo())
-                            .numberCustomersRated(restaurant.getNumberOfCustomersRated())
+                            .averagePrice(restaurant.getAvgPrice())
+                            .numberCustomersRated(restaurant.getNumberCustomersRated())
                             .address(responseAddress)
                             .categories(categoryString)
             );
@@ -152,8 +152,8 @@ public class RestaurantController {
                             .restaurantName(restaurant.getRestaurantName())
                             .photoURL(restaurant.getPhotoUrl())
                             .customerRating( new BigDecimal(restaurant.getCustomerRating(), MathContext.DECIMAL64))
-                            .averagePrice(restaurant.getAveragePriceForTwo())
-                            .numberCustomersRated(restaurant.getNumberOfCustomersRated())
+                            .averagePrice(restaurant.getAvgPrice())
+                            .numberCustomersRated(restaurant.getNumberCustomersRated())
                             .address(responseAddress)
                             .categories(categoryString)
             );
@@ -192,8 +192,8 @@ public class RestaurantController {
                 .restaurantName(restaurant.getRestaurantName())
                 .photoURL(restaurant.getPhotoUrl())
                 .customerRating( new BigDecimal(restaurant.getCustomerRating(), MathContext.DECIMAL64))
-                .averagePrice(restaurant.getAveragePriceForTwo())
-                .numberCustomersRated(restaurant.getNumberOfCustomersRated())
+                .averagePrice(restaurant.getAvgPrice())
+                .numberCustomersRated(restaurant.getNumberCustomersRated())
                 .address(responseAddress);
 
         List<CategoryEntity> categories = categoryService.getCategoriesForRestaurant(restaurant.getId());
@@ -234,12 +234,12 @@ public class RestaurantController {
 
         RestaurantEntity restaurant = restaurantService.getrestaurantById(restaurantId);
 
-        Double ratingIndex = (restaurant.getCustomerRating()*restaurant.getNumberOfCustomersRated());
+        Double ratingIndex = (restaurant.getCustomerRating()*restaurant.getNumberCustomersRated());
 
 
-        restaurant.setNumberOfCustomersRated(restaurant.getNumberOfCustomersRated()+1);
+        restaurant.setNumberCustomersRated(restaurant.getNumberCustomersRated()+1);
 
-        restaurant.setCustomerRating((ratingIndex+rating)/restaurant.getNumberOfCustomersRated());
+        restaurant.setCustomerRating((ratingIndex+rating)/restaurant.getNumberCustomersRated());
 
         RestaurantEntity result = restaurantService.updateNewratingsForRestaurant(restaurant);
 

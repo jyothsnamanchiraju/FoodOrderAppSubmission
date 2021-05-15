@@ -64,7 +64,7 @@ public class OrderController {
         CustomerEntity customerEntity = orderService.authenticateByAccessToken(bearerToken[1]);
 
         // Get all orders by customer
-        List<OrdersEntity> orderEntityList = orderService.getOrdersByCustomers(customerEntity);
+        List<OrdersEntity> orderEntityList = orderService.getOrdersByCustomers(customerEntity.getUuid());
 
         // Create response
         CustomerOrderResponse customerOrderResponse = new CustomerOrderResponse();
@@ -191,7 +191,7 @@ public class OrderController {
         AddressEntity tempAddressEntity = orderService.getAddressByUUID(saveOrderRequest.getAddressId(), loggedInCustomer);
 
         orderEntity.setAddress(tempAddressEntity);
-        orderEntity.setPayment(paymentService.getPaymentMethod(saveOrderRequest.getPaymentId().toString()));
+        orderEntity.setPayment(paymentService.getPaymentByUUID(saveOrderRequest.getPaymentId().toString()));
         orderEntity.setRestaurant(restaurantService.restaurantByUUID(saveOrderRequest.getRestaurantId().toString()));
         orderEntity.setDate(new Date());
         orderEntity.setBill(saveOrderRequest.getBill().doubleValue());

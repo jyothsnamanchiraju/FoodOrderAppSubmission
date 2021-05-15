@@ -19,8 +19,7 @@ public class PaymentService {
 
     }
 
-    //List all payments methods available in DB table
-    public PaymentEntity getPaymentMethod(String paymentUuid) throws PaymentMethodNotFoundException {
+    public PaymentEntity getPaymentByUUID(String paymentUuid) throws PaymentMethodNotFoundException {
         PaymentEntity paymentEntity = paymentDao.getMethodbyId(paymentUuid);
         if(paymentEntity==null){
             throw new PaymentMethodNotFoundException("PNF-002","No payment method found by this id");

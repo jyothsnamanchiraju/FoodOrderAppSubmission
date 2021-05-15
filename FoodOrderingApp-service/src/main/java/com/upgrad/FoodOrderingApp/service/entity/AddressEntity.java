@@ -53,6 +53,19 @@ public class AddressEntity implements Serializable {
     @Column(name = "active")
     private Integer active;
 
+    public AddressEntity() {
+        
+    }
+
+    public AddressEntity(@NotNull @Size(max = 200)String uuid, @Size(max = 255) String flatBuildingNumber, @Size(max = 255) String locality, @Size(max = 30) String city, @Size(max = 30) String pincode, StateEntity state) {
+        this.uuid = uuid;
+        this.flatBuildingNumber = flatBuildingNumber;
+        this.locality = locality;
+        this.city = city;
+        this.pincode = pincode;
+        this.state = state;
+    }
+
     public Integer getId() {
         return id;
     }
