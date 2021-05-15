@@ -61,6 +61,14 @@ public class RestaurantDao {
         }
     }
 
+    //Return restaurant list sorted based on customer rating
+    public List<RestaurantEntity> restaurantsByRating() {
+        try {
+            return entityManager.createNamedQuery("allRestaurantsByRating", RestaurantEntity.class).getResultList();
+        } catch (NoResultException nre) {
+            return null;
+        }
+    }
 
     public AddressEntity getAddress(Integer id) {
 

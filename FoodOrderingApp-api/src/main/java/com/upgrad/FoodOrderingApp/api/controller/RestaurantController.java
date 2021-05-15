@@ -77,7 +77,7 @@ public class RestaurantController {
             throw new RestaurantNotFoundException("RNF-003", "Restaurant name field should not be empty");
         }
 
-        List<RestaurantEntity> restaurants = restaurantService.getRestaurantsByName(restaurantName);
+        List<RestaurantEntity> restaurants = restaurantService.restaurantsByName(restaurantName);
 
         RestaurantListResponse response = new RestaurantListResponse();
         for(RestaurantEntity restaurant:restaurants){
@@ -123,7 +123,7 @@ public class RestaurantController {
             throw new CategoryNotFoundException("CNF-001", "Category id field should not be empty");
         }
 
-        List<RestaurantEntity> restaurants = restaurantService.getRestaurantByCategory(categoryId);
+        List<RestaurantEntity> restaurants = restaurantService.restaurantByCategory(categoryId);
 
         RestaurantListResponse response = new RestaurantListResponse();
         for(RestaurantEntity restaurant:restaurants){
@@ -234,14 +234,7 @@ public class RestaurantController {
 
         RestaurantEntity restaurant = restaurantService.getrestaurantById(restaurantId);
 
-        Double ratingIndex = (restaurant.getCustomerRating()*restaurant.getNumberCustomersRated());
-
-
-        restaurant.setNumberCustomersRated(restaurant.getNumberCustomersRated()+1);
-
-        restaurant.setCustomerRating((ratingIndex+rating)/restaurant.getNumberCustomersRated());
-
-        RestaurantEntity result = restaurantService.updateNewratingsForRestaurant(restaurant);
+        RestaurantEntity result = restaurantService.updateRestaurantRating(restaurant, rating);
 
         RestaurantUpdatedResponse response = new RestaurantUpdatedResponse()
                 .id(UUID.fromString(result.getUuid()))

@@ -20,7 +20,7 @@ public class RestaurantService {
         return restaurantDao.getAllRestaurant();
     }
 
-    public List<RestaurantEntity> getRestaurantsByName(String restaurantName){
+    public List<RestaurantEntity> restaurantsByName(String restaurantName){
         return restaurantDao.getRestaurantsByName(restaurantName);
     }
 
@@ -33,7 +33,7 @@ public class RestaurantService {
         return restaurantDao.getAddress(id);
     }
 
-    public List<RestaurantEntity> getRestaurantByCategory(String categoryId) throws CategoryNotFoundException {
+    public List<RestaurantEntity> restaurantByCategory(String categoryId) throws CategoryNotFoundException {
 
         if(restaurantDao.checkCategory(categoryId)==null){
             throw new CategoryNotFoundException("CNF-002","No category by this id");
@@ -72,7 +72,18 @@ public class RestaurantService {
         }
     }
 
-    public RestaurantEntity updateNewratingsForRestaurant(RestaurantEntity restaurant) {
+    //List all restaurants sorted by rating - Descending order
+    public List<RestaurantEntity> restaurantsByRating() {
+        return restaurantDao.restaurantsByRating();
+    }
+
+    public RestaurantEntity updateRestaurantRating(RestaurantEntity restaurant, Double rating) {
+        Double ratingIndex = (restaurant.getCustomerRating()*restaurant.getNumberCustomersRated());
+
+
+        restaurant.setNumberCustomersRated(restaurant.getNumberCustomersRated()+1);
+
+        restaurant.setCustomerRating((ratingIndex+rating)/restaurant.getNumberCustomersRated());
         return restaurantDao.updateRatings(restaurant);
     }
 
