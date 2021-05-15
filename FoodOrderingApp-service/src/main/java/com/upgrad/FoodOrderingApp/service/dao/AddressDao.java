@@ -45,7 +45,7 @@ public class AddressDao {
         }
     }
 
-    //recordCustomerAddressEntity(customerAddressEntity);
+    //recordCustomerAddressEntity
     public CustomerAddressEntity recordCustomerAddressEntity(CustomerAddressEntity customerAddressEntity){
         try {
             entityManager.persist(customerAddressEntity);
@@ -55,7 +55,7 @@ public class AddressDao {
         }
     }
 
-    //getAllAddresses(customerId)
+    //getAllAddresses of a customer
     public List<CustomerAddressEntity> getAllAddresses(CustomerEntity customer){
         try{
             return entityManager.createNamedQuery("getAddrByCustomerId", CustomerAddressEntity.class).setParameter("customer",customer).getResultList();
@@ -64,7 +64,7 @@ public class AddressDao {
         }
     }
 
-    //getAddressByUuid(addressUuid)
+    //getAddressByUuid
     public AddressEntity getAddressByUuid(String uuid) {
         try {
             return this.entityManager.createNamedQuery("getAddressByUuId", AddressEntity.class).setParameter("uuid",uuid).getSingleResult();
@@ -73,7 +73,7 @@ public class AddressDao {
         }
     }
 
-    //deleteAddress(address)
+    //deleteAddress of a customer
     public void deleteAddress(AddressEntity address) {
         try {
             entityManager.remove(address);
@@ -82,8 +82,7 @@ public class AddressDao {
         }
     }
 
-    //List<StateEntity> getAllStates()
-
+    //getAllStates as a list
     public List<StateEntity> getAllStates(){
         try {
             return this.entityManager.createNamedQuery("getAllStates", StateEntity.class).getResultList();

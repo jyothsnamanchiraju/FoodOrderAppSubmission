@@ -33,6 +33,7 @@ public class CustomerController {
     @Autowired
     private CustomerService customerService;
 
+    // API to register a customer
     @CrossOrigin
     @RequestMapping(method= RequestMethod.POST, path ="/customer/signup", consumes=MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<SignupCustomerResponse> signup(@RequestBody final SignupCustomerRequest signupCustomerRequest) throws SignUpRestrictedException{
@@ -65,6 +66,7 @@ public class CustomerController {
         return new ResponseEntity<SignupCustomerResponse>(signupCustomerResponse, HttpStatus.CREATED);
     }
 
+    // API for logging in
     @CrossOrigin
     @RequestMapping(method = RequestMethod.POST, path="/customer/login", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<LoginResponse> login(@RequestHeader("authorization") final String authorization) throws AuthenticationFailedException{
@@ -100,6 +102,7 @@ public class CustomerController {
         return new ResponseEntity<LoginResponse>(loginResponse, headers, HttpStatus.OK);
     }
 
+    // API to logout of app and update logout time in table
     @CrossOrigin
     @RequestMapping(method = RequestMethod.POST, path = "/customer/logout", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<LogoutResponse> logout(@RequestHeader("authorization") final String authorization) throws AuthorizationFailedException {
@@ -117,6 +120,7 @@ public class CustomerController {
         return new ResponseEntity<LogoutResponse>(logoutResponse, HttpStatus.OK);
     }
 
+    // API to update customer details
     @CrossOrigin
     @RequestMapping(method = RequestMethod.PUT, path = "/customer", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<UpdateCustomerResponse> updateCustomer(
@@ -155,6 +159,7 @@ public class CustomerController {
         return new ResponseEntity<UpdateCustomerResponse>(updateCustomerResponse,HttpStatus.OK);
     }
 
+    // API to update customer password
     @CrossOrigin
     @RequestMapping(method = RequestMethod.PUT, path = "/customer/password", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<UpdatePasswordResponse> changeCustomerPassword(

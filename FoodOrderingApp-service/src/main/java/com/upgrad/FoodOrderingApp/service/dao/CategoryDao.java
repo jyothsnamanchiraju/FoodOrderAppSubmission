@@ -14,6 +14,7 @@ public class CategoryDao {
     @PersistenceContext
     private EntityManager entityManager;
 
+    // get all categories from the table
     public List<CategoryEntity> getAllCategory(){
         try{
             return entityManager.createNativeQuery("Select c.* from category c order by c.category_name desc", CategoryEntity.class)

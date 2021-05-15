@@ -1,10 +1,7 @@
 package com.upgrad.FoodOrderingApp.service.businness;
 
-import com.upgrad.FoodOrderingApp.service.businness.PasswordCryptographyProvider;
-
 import com.upgrad.FoodOrderingApp.service.dao.CustomerAddressDao;
 import com.upgrad.FoodOrderingApp.service.entity.CustomerEntity;
-import com.upgrad.FoodOrderingApp.service.entity.CustomerAuthEntity;
 import com.upgrad.FoodOrderingApp.service.entity.AddressEntity;
 import com.upgrad.FoodOrderingApp.service.entity.CustomerAddressEntity;
 import com.upgrad.FoodOrderingApp.service.entity.StateEntity;
@@ -12,10 +9,6 @@ import com.upgrad.FoodOrderingApp.service.exception.*;
 import com.upgrad.FoodOrderingApp.service.dao.AddressDao;
 import com.upgrad.FoodOrderingApp.service.dao.CustomerDao;
 
-import java.time.ZonedDateTime;
-import java.util.UUID;
-
-import org.springframework.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -26,9 +19,6 @@ import java.util.*;
 public class AddressService {
 
     @Autowired
-    private CustomerDao customerDao;
-
-    @Autowired
     private AddressDao addressDao;
 
     @Autowired
@@ -37,9 +27,12 @@ public class AddressService {
     @Autowired
     private PasswordCryptographyProvider cryptographyProvider;
 
+    // save address of a customer
     @Transactional(propagation = Propagation.REQUIRED)
     public AddressEntity saveAddress(final AddressEntity addressEntity, final CustomerEntity customerEntity)
             throws SaveAddressException {
+
+        //check for null values
         try{
             addressEntity.getFlatBuilNo().isEmpty();
             addressEntity.getLocality().isEmpty();
@@ -58,7 +51,7 @@ public class AddressService {
             throw new SaveAddressException("SAR-001", "No field can be empty.");
         }
 
-        validatePincode(addressEntity.getPincode());
+        validatePincode(addressEntity.getPincode()); // validate if pincode is correct
         AddressEntity createdAddress = addressDao.createNewAddress(addressEntity);
 
         CustomerAddressEntity customerAddressEntity = new CustomerAddressEntity();
@@ -97,6 +90,7 @@ public class AddressService {
         return customerAddressDao.getCustomerAddressByAddressId(addressEntity);
     }
 
+    // get all the addresses of a customer
     @Transactional(propagation = Propagation.REQUIRED)
     public List<AddressEntity> getAllAddress(final CustomerEntity customerEntity) {
 
@@ -114,13 +108,10 @@ public class AddressService {
         return addresses;
     }
 
-    //deleteAddress(customerAccessToken, addressUuid);
+    //deleteAddress of a customer in Address table
     @Transactional(propagation = Propagation.REQUIRED)
-    public AddressEntity deleteAddress(final AddressEntity addressEntity)
-            throws AuthorizationFailedException, AddressNotFoundException {
-
+    public AddressEntity deleteAddress(final AddressEntity addressEntity) {
         addressDao.deleteAddress(addressEntity);
-
         return addressEntity;
     }
 

@@ -24,6 +24,7 @@ public class ItemController {
     @Autowired
     private RestaurantService restaurantService;
 
+    //Lists top 5 items decided based on number of orders from a restaurant
     @CrossOrigin
     @GetMapping(path = "/item/restaurant/{restaurant_id}")
     @ResponseBody

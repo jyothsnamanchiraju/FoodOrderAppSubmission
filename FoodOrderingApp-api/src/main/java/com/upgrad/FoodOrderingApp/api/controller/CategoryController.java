@@ -23,6 +23,7 @@ public class CategoryController {
     @Autowired
     private CategoryService categoryService;
 
+    //Lists all categories in the category table
     @CrossOrigin
     @GetMapping(path = "/category")
     @ResponseBody
@@ -39,6 +40,7 @@ public class CategoryController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    //Lists all items that belong to a particular category
     @CrossOrigin
     @GetMapping(path = "/category/{category_id}")
     @ResponseBody

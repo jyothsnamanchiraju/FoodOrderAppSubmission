@@ -37,6 +37,7 @@ public class RestaurantController {
     @Autowired
     private ItemService itemService;
 
+    // API to get all the restaurants
     @CrossOrigin
     @GetMapping(path = "/restaurant")
     @ResponseBody
@@ -75,6 +76,7 @@ public class RestaurantController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    // API to get restaurant by restaurant_name
     @CrossOrigin
     @GetMapping(path = "/restaurant/name/{restaurant_name}")
     @ResponseBody
@@ -119,6 +121,7 @@ public class RestaurantController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    // API to get restaurant category by category_id
     @CrossOrigin
     @GetMapping(path = "/restaurant/category/{category_id}")
     @ResponseBody
@@ -164,6 +167,7 @@ public class RestaurantController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    // API to get restaurant by restaurant_id
     @CrossOrigin
     @GetMapping(path = "/api/restaurant/{restaurant_id}")
     @ResponseBody
@@ -218,6 +222,7 @@ public class RestaurantController {
 
     }
 
+    //API to update restaurant ratings
     @CrossOrigin
     @PutMapping(path = "/api/restaurant/{restaurant_id}")
     @ResponseBody

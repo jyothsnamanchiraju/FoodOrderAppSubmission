@@ -24,6 +24,7 @@ public class CustomerService {
     @Autowired
     private PasswordCryptographyProvider cryptographyProvider;
 
+    // Basic authentication for logging in
     @Transactional(propagation = Propagation.REQUIRED)
     public CustomerAuthEntity authenticate(final String contactNumber, final String password) throws AuthenticationFailedException {
 
@@ -73,7 +74,6 @@ public class CustomerService {
             throw new AuthorizationFailedException("ATHR-003","Your session is expired. Log in again to access this endpoint.");
         }
 
-
         customerAuthEntity.setLogoutAt(now);
         customerDao.updateLogoutTime(customerAuthEntity);
 
@@ -111,8 +111,10 @@ public class CustomerService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     public CustomerEntity saveCustomer(CustomerEntity customerEntity)throws SignUpRestrictedException{
+
         //check if the contact_number already exists for another account
         CustomerEntity checkCustomer = customerDao.getCustomerByContactNumber(customerEntity.getContactNumber());
+
         if(checkCustomer !=null){
             throw new SignUpRestrictedException("SGR-001", "This contact number is already registered! Try other contact number.");
         }
@@ -139,6 +141,7 @@ public class CustomerService {
 
     }
 
+    // validate email ID
     private boolean checkEmail(String email){
         boolean hasAtSymbol = false;
         boolean hasDot = false;
@@ -165,6 +168,7 @@ public class CustomerService {
 
     }
 
+    // Check for password strength
     private boolean checkPasswordStrength(String password){
         if (password.length()<8)
             return false;

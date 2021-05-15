@@ -21,6 +21,7 @@ public class CategoryService {
     @Autowired
     private RestaurantDao restaurantDao;
 
+    // get all categories ordered by category name
     public List<CategoryEntity> getAllCategoriesOrderedByName() throws CategoryNotFoundException {
         List<CategoryEntity> result = categoryDao.getAllCategory();
         if(result==null){

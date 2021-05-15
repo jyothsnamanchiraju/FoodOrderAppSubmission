@@ -59,6 +59,7 @@ public class RestaurantDao {
         }
     }
 
+    // get restaurants by category ID
     public List<RestaurantEntity> getByCategory(String categoryId){
         try{
             return entityManager.createNativeQuery("select r.* from restaurant r inner join (select cr.* from restaurant_category cr where cr.category_id = (select c.id from category c where c.uuid= ?)) rc on r.id = rc.restaurant_id;", RestaurantEntity.class)
@@ -79,6 +80,7 @@ public class RestaurantDao {
         }
     }
 
+    // update restaurant ratings
     @Transactional
     public RestaurantEntity updateRatings(RestaurantEntity restaurant) {
         try{

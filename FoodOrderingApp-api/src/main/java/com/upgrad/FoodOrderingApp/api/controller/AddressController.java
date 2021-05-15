@@ -45,6 +45,7 @@ public class AddressController {
     @Autowired
     private CustomerService customerService;
 
+    //API for creating/saving new address of a customer
     @CrossOrigin
     @RequestMapping(method= RequestMethod.POST, path ="/address", consumes=MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<SaveAddressResponse> createCustomerAddress(
@@ -76,6 +77,7 @@ public class AddressController {
         return new ResponseEntity<SaveAddressResponse>(saveAddressResponse, HttpStatus.CREATED);
     }
 
+    //API to list all saved addresses of a customer
     @CrossOrigin
     @RequestMapping(method= RequestMethod.GET, path ="/address/customer", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<AddressListResponse> getAllAddresses(@RequestHeader("authorization") final String authorization)
@@ -111,6 +113,7 @@ public class AddressController {
 
     }
 
+    //API to delete address of a customer using address ID from list of addresses created by a customer
     @CrossOrigin
     @RequestMapping(method= RequestMethod.DELETE, path ="/address/{address_id}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<DeleteAddressResponse> deleteAddress(
@@ -131,6 +134,7 @@ public class AddressController {
 
     }
 
+    //List all States in the table
     @CrossOrigin
     @RequestMapping(method= RequestMethod.GET, path ="/states", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<StatesListResponse> getAllStates() {

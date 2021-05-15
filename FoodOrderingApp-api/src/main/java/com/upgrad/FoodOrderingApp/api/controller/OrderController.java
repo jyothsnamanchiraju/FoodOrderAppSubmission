@@ -62,6 +62,7 @@ public class OrderController {
         return new ResponseEntity<CouponDetailsResponse>(couponDetailsResponse, HttpStatus.OK);
     }
 
+    // API to get all the orders placed by a customer
     @CrossOrigin
     @RequestMapping(method = RequestMethod.GET, path = "/order", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<CustomerOrderResponse> getCustomerOrders(
@@ -73,13 +74,13 @@ public class OrderController {
         // Get all orders by customer
         List<OrdersEntity> orderEntityList = orderService.getOrdersByCustomers(customerEntity.getUuid());
 
-        // Create response
         CustomerOrderResponse customerOrderResponse = new CustomerOrderResponse();
 
         if (orderEntityList != null) {
 
             for (OrdersEntity orderEntity : orderEntityList) { // loop through all the order entities
                 OrderListCoupon orderListCoupon = null;
+
                 /* Handling null value for coupon_id
                    Included this logic considering that not all orders will have a coupon_id
                  */

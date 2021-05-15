@@ -39,8 +39,7 @@ public class ItemService {
         return itemEntity;
     }
 
-    //List top 5 items in a restaurant
-    //Sorted by number of orders - descending
+    //List top 5 items in a restaurant sorted by number of orders - descending
     public List<ItemEntity> getItemsByPopularity(RestaurantEntity restaurantEntity) {
         return itemDao.getTopItems(restaurantEntity.getId());
     }
