@@ -26,7 +26,7 @@ public class OrderController {
     private ItemService itemService;
 
     @Autowired
-    private AddressService addressService;
+    private CustomerService customerService;
 
     @Autowired
     private PaymentService paymentService;
@@ -42,8 +42,12 @@ public class OrderController {
             @RequestHeader("authorization") final String authorization)
             throws AuthorizationFailedException, CouponNotFoundException
     {
+        if (couponName.equals("")) {
+            throw new CouponNotFoundException("CPF-002", "Coupon name field should not be empty");
+        }
+
         String[] bearerToken = authorization.split("Bearer "); //splitting authorization string to get access token
-        CustomerEntity customerEntity = orderService.authenticateByAccessToken(bearerToken[1]);
+        CustomerEntity customerEntity = customerService.getCustomer(bearerToken[1]);
 
         CouponEntity couponEntity = orderService.getCouponByCouponName(couponName);
 
