@@ -63,9 +63,9 @@ public class OrderService {
         return couponEntity;
     }
 
-    public List<OrdersEntity> getOrdersByCustomers(String customerId) {
+    public List<OrdersEntity> getOrdersByCustomers(CustomerEntity customerEntity) {
         List<OrdersEntity> orderEntityList = new ArrayList<>();
-        for (OrdersEntity orderEntity : orderDao.getOrdersByCustomers(customerId)) {
+        for (OrdersEntity orderEntity : orderDao.getOrdersByCustomers(customerEntity)) {
             orderEntityList.add(orderEntity);
         }
         return orderEntityList;

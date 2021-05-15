@@ -71,7 +71,7 @@ public class OrderController {
         CustomerEntity customerEntity = customerService.getCustomer(bearerToken[1]);
 
         // Get all orders by customer
-        List<OrdersEntity> orderEntityList = orderService.getOrdersByCustomers(customerEntity.getUuid());
+        List<OrdersEntity> orderEntityList = orderService.getOrdersByCustomers(customerEntity);
 
         // Create response
         CustomerOrderResponse customerOrderResponse = new CustomerOrderResponse();
@@ -180,13 +180,13 @@ public class OrderController {
         final OrdersEntity orderEntity = new OrdersEntity();
         orderEntity.setUuid(UUID.randomUUID().toString());
 
-        CouponEntity couponByCouponId = orderService.getCouponByCouponId(saveOrderRequest.getCouponId().toString());
-        PaymentEntity payment = paymentService.getPaymentByUUID(saveOrderRequest.getPaymentId().toString());
-        AddressEntity tempAddressEntity = addressService.getAddressByUUID(saveOrderRequest.getAddressId(), customerEntity);
-
         if(saveOrderRequest.getCouponId() != null) {
+            CouponEntity couponByCouponId = orderService.getCouponByCouponId(saveOrderRequest.getCouponId().toString());
             orderEntity.setCoupon(couponByCouponId);
         }
+
+        PaymentEntity payment = paymentService.getPaymentByUUID(saveOrderRequest.getPaymentId().toString());
+        AddressEntity tempAddressEntity = addressService.getAddressByUUID(saveOrderRequest.getAddressId(), customerEntity);
 
         /* Allowing null value for discount
            Defaulting to 0.00 if no value entered
