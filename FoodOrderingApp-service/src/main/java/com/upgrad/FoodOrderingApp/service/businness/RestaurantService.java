@@ -47,11 +47,13 @@ public class RestaurantService {
             throw new InvalidRatingException("IRE-001", "Restaurant should be in the range of 1 to 5");
         }
 
-        Double ratingIndex = (restaurant.getCustomerRating()*restaurant.getNumberCustomersRated());
+        Double ratingIndex = ((restaurant.getCustomerRating()*restaurant.getNumberCustomersRated()) + CustomerRating)/
+                (restaurant.getNumberCustomersRated()+1);
+        ratingIndex = Math.floor(ratingIndex*100)/100;
 
         restaurant.setNumberCustomersRated(restaurant.getNumberCustomersRated()+1);
 
-        restaurant.setCustomerRating((ratingIndex+CustomerRating)/restaurant.getNumberCustomersRated());
+        restaurant.setCustomerRating(ratingIndex);
         return restaurantDao.updateRatings(restaurant);
     }
 
