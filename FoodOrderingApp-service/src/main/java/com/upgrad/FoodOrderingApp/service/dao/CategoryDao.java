@@ -36,15 +36,4 @@ public class CategoryDao {
         }
     }
 
-    public List<CategoryEntity> getCategoryForRestaurant(Integer id) {
-        try{
-            return entityManager.createNativeQuery("select c.* from category c inner join (select rc.* from restaurant_category rc where rc.restaurant_id=?) r on c.id=r.category_id  order by c.category_name asc;", CategoryEntity.class)
-                    .setParameter(1, id)
-                    .getResultList();
-        }
-        catch (NoResultException exception){
-            return null;
-        }
-    }
-
 }

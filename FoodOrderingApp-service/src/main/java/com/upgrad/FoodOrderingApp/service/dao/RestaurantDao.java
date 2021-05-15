@@ -15,17 +15,6 @@ public class RestaurantDao {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public RestaurantEntity getRestaurantById(String restaurantId) {
-        try{
-            return (RestaurantEntity) entityManager.createNativeQuery("select r.* from restaurant r where r.uuid = ?", RestaurantEntity.class)
-                    .setParameter(1, restaurantId)
-                    .getSingleResult();
-        }
-        catch(NoResultException exception){
-            return null;
-        }
-    }
-
     public List<RestaurantEntity> getRestaurantsByName(String restaurantName){
         restaurantName="%"+restaurantName+"%";
 
@@ -35,17 +24,6 @@ public class RestaurantDao {
                     .getResultList();
         }
         catch (NoResultException exception){
-            return null;
-        }
-    }
-
-
-    public List<RestaurantEntity> getAllRestaurant() {
-        try{
-            return entityManager.createNativeQuery("select r.* from restaurant r;", RestaurantEntity.class)
-                    .getResultList();
-        }
-        catch(NoResultException exception){
             return null;
         }
     }
@@ -71,7 +49,6 @@ public class RestaurantDao {
     }
 
     public AddressEntity getAddress(Integer id) {
-
         try{
             return (AddressEntity) entityManager.createNativeQuery("select a.* from address a inner join (select r.* from restaurant r where r.id = ?) ra on a.id = ra.address_id;", AddressEntity.class)
                     .setParameter(1, id)
@@ -98,51 +75,6 @@ public class RestaurantDao {
             return (CategoryEntity) entityManager.createNativeQuery("select c.* from category c where c.uuid = ?;", CategoryEntity.class).setParameter(1, categoryId).getSingleResult();
         }
         catch (NoResultException exception){
-            return null;
-        }
-    }
-
-    public List<ItemEntity> getItemsOnCategoryForRestaurant(Integer restaurantId, Integer categoryId) {
-        try{
-            return entityManager.createNativeQuery("select i.* from item i inner join (select i3.item_id from (select ci.item_id from category_item ci where ci.category_id = :category) i3 inner join (select ri.item_id from restaurant_item ri where ri.restaurant_id = :restaurant) i4 on i3.item_id = i4.item_id) i2 on i.id=i2.item_id;", ItemEntity.class)
-                    .setParameter("category", categoryId)
-                    .setParameter("restaurant", restaurantId)
-                    .getResultList();
-        }
-        catch(NoResultException exception){
-            return null;
-        }
-    }
-
-    public CustomerAuthEntity authoriseUser(String authorization) {
-        try{
-            return (CustomerAuthEntity) entityManager.createNativeQuery("select c.* from customer_auth c where c.access_token = ?;", CustomerAuthEntity.class)
-                    .setParameter(1, authorization)
-                    .getSingleResult();
-        }
-        catch(NoResultException exception){
-            return null;
-        }
-    }
-
-    public CustomerAuthEntity authoriseUserLogout(String authorization) {
-        try {
-            return (CustomerAuthEntity) entityManager.createNativeQuery("select c.* from customer_auth c where c.access_token = ? and c.logout_at is null;", CustomerAuthEntity.class)
-                    .setParameter(1, authorization)
-                    .getSingleResult();
-        }
-        catch(NoResultException exception){
-            return null;
-        }
-    }
-
-    public CustomerAuthEntity authoriseUserSession(String authorization) {
-        try{
-            return (CustomerAuthEntity) entityManager.createNativeQuery("select c.* from customer_auth c where c.access_token = ? and c.expires_at>now();", CustomerAuthEntity.class)
-                    .setParameter(1, authorization)
-                    .getSingleResult();
-        }
-        catch(NoResultException exception){
             return null;
         }
     }
