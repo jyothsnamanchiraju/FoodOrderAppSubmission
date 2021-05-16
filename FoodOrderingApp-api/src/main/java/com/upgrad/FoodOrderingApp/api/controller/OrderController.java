@@ -26,13 +26,16 @@ public class OrderController {
     private ItemService itemService;
 
     @Autowired
-    private AddressService addressService;
+    private CustomerService customerService;
 
     @Autowired
     private PaymentService paymentService;
 
     @Autowired
     private RestaurantService restaurantService;
+
+    @Autowired
+    private AddressService addressService;
 
     //Get coupon by coupon name
     @CrossOrigin
@@ -42,8 +45,12 @@ public class OrderController {
             @RequestHeader("authorization") final String authorization)
             throws AuthorizationFailedException, CouponNotFoundException
     {
+        if (couponName.equals("")) {
+            throw new CouponNotFoundException("CPF-002", "Coupon name field should not be empty");
+        }
+
         String[] bearerToken = authorization.split("Bearer "); //splitting authorization string to get access token
-        CustomerEntity customerEntity = orderService.authenticateByAccessToken(bearerToken[1]);
+        CustomerEntity customerEntity = customerService.getCustomer(bearerToken[1]);
 
         CouponEntity couponEntity = orderService.getCouponByCouponName(couponName);
 
@@ -55,24 +62,25 @@ public class OrderController {
         return new ResponseEntity<CouponDetailsResponse>(couponDetailsResponse, HttpStatus.OK);
     }
 
+    // API to get all the orders placed by a customer
     @CrossOrigin
     @RequestMapping(method = RequestMethod.GET, path = "/order", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<CustomerOrderResponse> getCustomerOrders(
             @RequestHeader("authorization") final String authorization)
             throws AuthorizationFailedException {
         String[] bearerToken = authorization.split("Bearer "); //splitting authorization string to get access token
-        CustomerEntity customerEntity = orderService.authenticateByAccessToken(bearerToken[1]);
+        CustomerEntity customerEntity = customerService.getCustomer(bearerToken[1]);
 
         // Get all orders by customer
-        List<OrdersEntity> orderEntityList = orderService.getOrdersByCustomers(customerEntity);
+        List<OrderEntity> orderEntityList = orderService.getOrdersByCustomers(customerEntity.getUuid());
 
-        // Create response
         CustomerOrderResponse customerOrderResponse = new CustomerOrderResponse();
 
         if (orderEntityList != null) {
 
-            for (OrdersEntity orderEntity : orderEntityList) { // loop through all the order entities
+            for (OrderEntity orderEntity : orderEntityList) { // loop through all the order entities
                 OrderListCoupon orderListCoupon = null;
+
                 /* Handling null value for coupon_id
                    Included this logic considering that not all orders will have a coupon_id
                  */
@@ -105,7 +113,7 @@ public class OrderController {
 
                 OrderListAddress orderListAddress = new OrderListAddress()
                         .id(UUID.fromString(orderEntity.getAddress().getUuid()))
-                        .flatBuildingName(orderEntity.getAddress().getFlatBuildingNumber())
+                        .flatBuildingName(orderEntity.getAddress().getFlatBuilNo())
                         .locality(orderEntity.getAddress().getLocality())
                         .city(orderEntity.getAddress().getCity())
                         .pincode(orderEntity.getAddress().getPincode())
@@ -147,33 +155,39 @@ public class OrderController {
     @CrossOrigin
     @RequestMapping(method = RequestMethod.POST, path = "/order", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<SaveOrderResponse> saveOrder(
-            final SaveOrderRequest saveOrderRequest,
+            @RequestBody final SaveOrderRequest saveOrderRequest,
             @RequestHeader("authorization") final String authorization)
             throws AuthorizationFailedException, CouponNotFoundException,
             AddressNotFoundException, PaymentMethodNotFoundException,
             RestaurantNotFoundException, ItemNotFoundException, SaveOrderException {
 
         String[] bearerToken = authorization.split("Bearer "); //splitting authorization string to get access token
-        CustomerEntity customerEntity = orderService.authenticateByAccessToken(bearerToken[1]);
+        CustomerEntity customerEntity = customerService.getCustomer(bearerToken[1]);
 
         /* Ensuring no fields are empty except coupon_id and discount
          * Included this logic considering that not all orders will have a coupon_id and discount
          * but other values are required
         */
-        if(saveOrderRequest.getAddressId() == null || saveOrderRequest.getItemQuantities().get(0).getItemId() == null ||
-                saveOrderRequest.getItemQuantities().get(0).getPrice() == null ||
-                saveOrderRequest.getItemQuantities().get(0).getQuantity() == null ||
-                saveOrderRequest.getRestaurantId() == null || saveOrderRequest.getPaymentId() == null ||
-                saveOrderRequest.getBill() == null){
+        if(saveOrderRequest.getAddressId() == null
+                || saveOrderRequest.getItemQuantities().get(0).getItemId() == null
+                || saveOrderRequest.getItemQuantities().get(0).getPrice() == null
+                || saveOrderRequest.getItemQuantities().get(0).getQuantity() == null
+                || saveOrderRequest.getRestaurantId() == null
+                || saveOrderRequest.getPaymentId() == null
+                || saveOrderRequest.getBill() == null){
             throw new SaveOrderException("SOR-001","No field should be empty except Coupon_Id and discount");
         }
 
-        final OrdersEntity orderEntity = new OrdersEntity();
+        final OrderEntity orderEntity = new OrderEntity();
         orderEntity.setUuid(UUID.randomUUID().toString());
 
         if(saveOrderRequest.getCouponId() != null) {
-            orderEntity.setCoupon(orderService.getCouponByCouponId(saveOrderRequest.getCouponId().toString()));
+            CouponEntity couponByCouponId = orderService.getCouponByCouponId(saveOrderRequest.getCouponId().toString());
+            orderEntity.setCoupon(couponByCouponId);
         }
+
+        PaymentEntity payment = paymentService.getPaymentByUUID(saveOrderRequest.getPaymentId().toString());
+        AddressEntity tempAddressEntity = addressService.getAddressByUUID(saveOrderRequest.getAddressId(), customerEntity);
 
         /* Allowing null value for discount
            Defaulting to 0.00 if no value entered
@@ -186,16 +200,13 @@ public class OrderController {
         }
 
         orderEntity.setCustomer(customerEntity);
-        CustomerEntity loggedInCustomer = customerEntity;
-
-        AddressEntity tempAddressEntity = orderService.getAddressByUUID(saveOrderRequest.getAddressId(), loggedInCustomer);
 
         orderEntity.setAddress(tempAddressEntity);
-        orderEntity.setPayment(paymentService.getPaymentMethod(saveOrderRequest.getPaymentId().toString()));
+        orderEntity.setPayment(payment);
         orderEntity.setRestaurant(restaurantService.restaurantByUUID(saveOrderRequest.getRestaurantId().toString()));
         orderEntity.setDate(new Date());
         orderEntity.setBill(saveOrderRequest.getBill().doubleValue());
-        OrdersEntity savedOrderEntity = orderService.saveOrder(orderEntity);
+        OrderEntity savedOrderEntity = orderService.saveOrder(orderEntity);
 
         for (ItemQuantity itemQuantity : saveOrderRequest.getItemQuantities()) {
             OrderItemEntity orderItemEntity = new OrderItemEntity();

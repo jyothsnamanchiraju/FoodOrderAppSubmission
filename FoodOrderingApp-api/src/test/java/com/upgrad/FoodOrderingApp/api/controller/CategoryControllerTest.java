@@ -1,4 +1,4 @@
-/*
+
 package com.upgrad.FoodOrderingApp.api.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,7 +22,7 @@ import java.util.Collections;
 import java.util.UUID;
 
 import static com.upgrad.FoodOrderingApp.service.common.ItemType.NON_VEG;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*; // imported all the static methods in Assert
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -46,7 +46,7 @@ public class CategoryControllerTest {
         final ItemEntity itemEntity = new ItemEntity();
         itemEntity.setItemName("myItem");
         itemEntity.setPrice(200);
-        itemEntity.setType(NON_VEG);
+        itemEntity.setType(NON_VEG.toString()); // setType accepts string and not of value ItemType
         final String itemId = UUID.randomUUID().toString();
         itemEntity.setUuid(itemId);
 
@@ -139,4 +139,4 @@ public class CategoryControllerTest {
     }
 
 
-}*/
+}

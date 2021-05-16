@@ -23,7 +23,6 @@ public class PaymentController {
     private PaymentService paymentService;
 
     //Lists all available payment methods
-    //No API input
     @CrossOrigin
     @RequestMapping(method = RequestMethod.GET, path = "/payment", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<PaymentListResponse> getPaymentResponse() {

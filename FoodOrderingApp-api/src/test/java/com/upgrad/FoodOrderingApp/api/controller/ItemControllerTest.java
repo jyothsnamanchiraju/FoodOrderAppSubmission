@@ -1,4 +1,4 @@
-/*
+
 package com.upgrad.FoodOrderingApp.api.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,6 +21,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Collections;
 import java.util.UUID;
 
+import static org.junit.Assert.*; // Have imported all
 import static com.upgrad.FoodOrderingApp.service.common.ItemType.NON_VEG;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -51,7 +52,7 @@ public class ItemControllerTest {
         final ItemEntity itemEntity = new ItemEntity();
         final String itemId = UUID.randomUUID().toString();
         itemEntity.setUuid(itemId);
-        itemEntity.setType(NON_VEG);
+        itemEntity.setType(NON_VEG.toString());  // setType accepts string and not of value ItemType
         when(mockItemService.getItemsByPopularity(restaurantEntity))
                 .thenReturn(Collections.singletonList(itemEntity));
 
@@ -80,4 +81,4 @@ public class ItemControllerTest {
                 .andExpect(jsonPath("code").value("RNF-001"));
     }
 
-}*/
+}

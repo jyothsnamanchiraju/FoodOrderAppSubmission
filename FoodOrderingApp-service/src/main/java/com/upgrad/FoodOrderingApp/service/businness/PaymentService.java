@@ -14,13 +14,13 @@ public class PaymentService {
     @Autowired
     private PaymentDao paymentDao;
 
+    //get all payment methods
     public List<PaymentEntity> getAllPaymentMethods() {
         return paymentDao.getAllPaymentMethods();
-
     }
 
-    //List all payments methods available in DB table
-    public PaymentEntity getPaymentMethod(String paymentUuid) throws PaymentMethodNotFoundException {
+    // get single payment by UUID
+    public PaymentEntity getPaymentByUUID(String paymentUuid) throws PaymentMethodNotFoundException {
         PaymentEntity paymentEntity = paymentDao.getMethodbyId(paymentUuid);
         if(paymentEntity==null){
             throw new PaymentMethodNotFoundException("PNF-002","No payment method found by this id");

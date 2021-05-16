@@ -15,7 +15,7 @@ public class PaymentDao {
     @PersistenceContext
     private EntityManager entityManager;
 
-    //List all payment methods availabel in DB
+    //List all payment methods available in DB
     public List<PaymentEntity> getAllPaymentMethods(){
         try{
             return this.entityManager.createNamedQuery("allPaymentMethods", PaymentEntity.class).getResultList();
@@ -24,7 +24,7 @@ public class PaymentDao {
         }
     }
 
-    //Return payment method by paymet UUID
+    //Return payment method by payment UUID
     public PaymentEntity getMethodbyId(final String uuid){
         try{
             return entityManager.createNamedQuery("getMethodbyId", PaymentEntity.class).setParameter("uuid", uuid).getSingleResult();

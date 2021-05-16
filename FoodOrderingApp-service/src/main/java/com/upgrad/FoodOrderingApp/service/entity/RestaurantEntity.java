@@ -4,11 +4,14 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name="restaurant")
 @NamedQueries({
         @NamedQuery(name = "restaurantByUUID", query = "select q from RestaurantEntity q where q.uuid = :uuid"),
+        @NamedQuery(name = "allRestaurantsByRating", query = "select q from RestaurantEntity q order by q.customerRating desc"),
 })
 public class RestaurantEntity implements Serializable {
     @Id
@@ -46,6 +49,32 @@ public class RestaurantEntity implements Serializable {
     @JoinColumn(name="address_id")
     @NotNull
     private AddressEntity address;
+
+    @ManyToMany
+    @JoinTable(name = "restaurant_category", joinColumns = @JoinColumn(name = "restaurant_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id"))
+    private List<CategoryEntity> categories = new ArrayList<>();
+
+    @ManyToMany
+    @JoinTable(name = "restaurant_item", joinColumns = @JoinColumn(name = "restaurant_id"),
+            inverseJoinColumns = @JoinColumn(name = "item_id"))
+    private List<ItemEntity> items = new ArrayList<>();
+
+    public List<ItemEntity> getItems() {
+        return items;
+    }
+
+    public void setItems(List<ItemEntity> items) {
+        this.items = items;
+    }
+
+    public List<CategoryEntity> getCategories() {
+        return categories;
+    }
+
+    public void setCategories(List<CategoryEntity> categories) {
+        this.categories = categories;
+    }
 
     public Integer getId() {
         return id;
@@ -87,19 +116,19 @@ public class RestaurantEntity implements Serializable {
         this.customerRating = customerRating;
     }
 
-    public Integer getAveragePriceForTwo() {
+    public Integer getAvgPrice() {
         return averagePriceForTwo;
     }
 
-    public void setAveragePriceForTwo(Integer averagePriceForTwo) {
+    public void setAvgPrice(Integer averagePriceForTwo) {
         this.averagePriceForTwo = averagePriceForTwo;
     }
 
-    public Integer getNumberOfCustomersRated() {
+    public Integer getNumberCustomersRated() {
         return numberOfCustomersRated;
     }
 
-    public void setNumberOfCustomersRated(Integer numberOfCustomersRated) {
+    public void setNumberCustomersRated(Integer numberOfCustomersRated) {
         this.numberOfCustomersRated = numberOfCustomersRated;
     }
 

@@ -1,4 +1,4 @@
-/*
+
 package com.upgrad.FoodOrderingApp.api.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,7 +27,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Collections;
 import java.util.UUID;
 
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*; // Have imported all
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -433,4 +433,4 @@ public class AddressControllerTest {
         final StatesListResponse statesLists = new ObjectMapper().readValue(response, StatesListResponse.class);
         assertNull(statesLists.getStates());
     }
-}*/
+}

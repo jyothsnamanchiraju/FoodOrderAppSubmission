@@ -12,6 +12,9 @@ import com.upgrad.FoodOrderingApp.service.businness.AddressService;
 import com.upgrad.FoodOrderingApp.api.model.SaveAddressRequest;
 import com.upgrad.FoodOrderingApp.api.model.SaveAddressResponse;
 
+import com.upgrad.FoodOrderingApp.service.businness.CustomerService;
+import com.upgrad.FoodOrderingApp.service.dao.CustomerAddressDao;
+import com.upgrad.FoodOrderingApp.service.entity.CustomerEntity;
 import com.upgrad.FoodOrderingApp.service.exception.*;
 
 import com.upgrad.FoodOrderingApp.service.entity.AddressEntity;
@@ -23,11 +26,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpHeaders;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -43,64 +42,64 @@ public class AddressController {
     @Autowired
     private AddressService addressService;
 
-    @RequestMapping(method= RequestMethod.POST, path ="address", consumes=MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<SaveAddressResponse> createCustomerAddress(@RequestHeader("authorization") final String authorization, final SaveAddressRequest saveAddressRequest)
+    @Autowired
+    private CustomerService customerService;
+
+    //API for creating/saving new address of a customer
+    @CrossOrigin
+    @RequestMapping(method= RequestMethod.POST, path ="/address", consumes=MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<SaveAddressResponse> createCustomerAddress(
+            @RequestBody(required = false) final SaveAddressRequest saveAddressRequest,
+            @RequestHeader("authorization") final String authorization)
             throws AuthorizationFailedException, SaveAddressException, AddressNotFoundException {
 
         String[] bearerToken = authorization.split("Bearer ");
         String customerAccessToken = bearerToken[1];
 
+        CustomerEntity customerEntity = customerService.getCustomer(customerAccessToken);
+
+        StateEntity stateEntity = addressService.getStateByUUID(saveAddressRequest.getStateUuid());
+
         AddressEntity addressEntity = new AddressEntity();
-
-        if(saveAddressRequest.getFlatBuildingName()== null || saveAddressRequest.getFlatBuildingName()==" "
-                || saveAddressRequest.getLocality() == null || saveAddressRequest.getLocality() == null
-                || saveAddressRequest.getCity()== null || saveAddressRequest.getCity()== " "
-                || saveAddressRequest.getPincode()== null ||saveAddressRequest.getPincode()== " "
-                || saveAddressRequest.getStateUuid()==null || saveAddressRequest.getStateUuid()== " "){
-            throw new SaveAddressException("SAR-001", "No field can be empty");
-        }
-
-        if(!validPincode(saveAddressRequest.getPincode())){
-            throw new SaveAddressException("SAR-002", "Invalid pincode");
-        }
-
         addressEntity.setUuid(UUID.randomUUID().toString());
-        addressEntity.setFlatBuildingNumber(saveAddressRequest.getFlatBuildingName());
+        addressEntity.setFlatBuilNo(saveAddressRequest.getFlatBuildingName());
         addressEntity.setLocality(saveAddressRequest.getLocality());
         addressEntity.setCity(saveAddressRequest.getCity());
         addressEntity.setPincode(saveAddressRequest.getPincode());
-        String stateUuid = saveAddressRequest.getStateUuid();
+        addressEntity.setState(stateEntity);
+        addressEntity.setActive(1);
 
-        final AddressEntity addressCreated = addressService.createAddress(customerAccessToken, addressEntity, stateUuid);
-        SaveAddressResponse saveAddressResponse = new SaveAddressResponse().id(addressCreated.getUuid()).status("ADDRESS SUCCESSFULLY REGISTERED") ;
+        final AddressEntity addressCreated = addressService.saveAddress(addressEntity, customerEntity);
+        SaveAddressResponse saveAddressResponse = new SaveAddressResponse()
+                .id(addressCreated.getUuid())
+                .status("ADDRESS SUCCESSFULLY REGISTERED") ;
+
         return new ResponseEntity<SaveAddressResponse>(saveAddressResponse, HttpStatus.CREATED);
     }
 
-
-    @RequestMapping(method= RequestMethod.GET, path ="address/customer", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    //API to list all saved addresses of a customer
+    @CrossOrigin
+    @RequestMapping(method= RequestMethod.GET, path ="/address/customer", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<AddressListResponse> getAllAddresses(@RequestHeader("authorization") final String authorization)
             throws AuthorizationFailedException {
 
         String[] bearerToken = authorization.split("Bearer ");
         String customerAccessToken = bearerToken[1];
+        CustomerEntity customerEntity = customerService.getCustomer(customerAccessToken);
 
         List<AddressList> listOfAddresses = new <AddressList> ArrayList();
-        List<AddressEntity> customerAddressList = new<AddressEntity> ArrayList();
-
-        customerAddressList = addressService.getAddressList(customerAccessToken);
+        List<AddressEntity> customerAddressList = addressService.getAllAddress(customerEntity);
 
         for(AddressEntity addr: customerAddressList){
             AddressList customerAddress = new AddressList();
-            StateEntity state = new StateEntity();
-            AddressListState aState = new AddressListState();
-            //UUID. fromString(uuidAsString);
             customerAddress.setId(UUID.fromString(addr.getUuid()));
-            customerAddress.setFlatBuildingName(addr.getFlatBuildingNumber());
+            customerAddress.setFlatBuildingName(addr.getFlatBuilNo());
             customerAddress.setLocality(addr.getLocality());
             customerAddress.setCity(addr.getCity());
             customerAddress.setPincode(addr.getPincode());
 
-            state= addr.getState();
+            StateEntity state = addr.getState();
+            AddressListState aState = new AddressListState();
             aState.setId(UUID.fromString(state.getUuid()));
             aState.setStateName(state.getStateName());
 
@@ -114,29 +113,35 @@ public class AddressController {
 
     }
 
-
-    @RequestMapping(method= RequestMethod.DELETE, path ="address/{address_id}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<DeleteAddressResponse> deleteAddress(@RequestHeader("authorization") final String authorization,
-                                                               @PathVariable("address_id") final String addressUuid)
+    //API to delete address of a customer using address ID from list of addresses created by a customer
+    @CrossOrigin
+    @RequestMapping(method= RequestMethod.DELETE, path ="/address/{address_id}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<DeleteAddressResponse> deleteAddress(
+            @RequestHeader("authorization") final String authorization,
+            @PathVariable("address_id") final String addressUuid)
             throws AuthorizationFailedException, AddressNotFoundException {
 
         String[] bearerToken = authorization.split("Bearer ");
         String customerAccessToken = bearerToken[1];
+        CustomerEntity customerEntity = customerService.getCustomer(customerAccessToken);
+
+        final AddressEntity addressEntity = addressService.getAddressByUUID(addressUuid,customerEntity);
+        final String uuid = addressService.deleteAddress(addressEntity).getUuid();
 
         DeleteAddressResponse deleteAddressResponse = new DeleteAddressResponse();
-        addressService.deleteAddress(customerAccessToken, addressUuid);
-        deleteAddressResponse.id(UUID.fromString(addressUuid)).status("ADDRESS_DELETED");
+        deleteAddressResponse.id(UUID.fromString(uuid)).status("ADDRESS DELETED SUCCESSFULLY");
         return new ResponseEntity<DeleteAddressResponse>(deleteAddressResponse, HttpStatus.OK);
 
     }
 
-
+    //List all States in the table
+    @CrossOrigin
     @RequestMapping(method= RequestMethod.GET, path ="/states", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<StatesListResponse> getAllAddresses() {
+    public ResponseEntity<StatesListResponse> getAllStates() {
 
         List<StateEntity> listOfAllStates = addressService.getAllStates();
 
-        List<StatesList> statesList = new <StatesList> ArrayList();
+        List<StatesList> statesList = new ArrayList<>();
 
         for(StateEntity s: listOfAllStates){
             StatesList state = new StatesList();
@@ -146,23 +151,14 @@ public class AddressController {
         }
 
         StatesListResponse statesListResponse = new StatesListResponse();
-        statesListResponse.states(statesList);
+        if (statesList.size() != 0) {
+
+            statesListResponse.states(statesList);
+        } else {
+            statesListResponse.states(null);
+        }
+
         return new ResponseEntity<StatesListResponse>(statesListResponse, HttpStatus.OK);
     }
 
-
-    private boolean validPincode(String pincode){
-        if(pincode.length() !=6)
-            return false;
-
-        boolean allNumeric = true;
-
-        for(int i=0; i<pincode.length(); i++){
-            if(!((int)pincode.charAt(i) >=48 && (int)pincode.charAt(i)<=57)){
-                allNumeric = false;
-            }
-        }
-
-        return allNumeric;
-    }
 }
