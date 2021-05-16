@@ -2,15 +2,12 @@ package com.upgrad.FoodOrderingApp.service.businness;
 
 import com.upgrad.FoodOrderingApp.service.dao.*;
 import com.upgrad.FoodOrderingApp.service.entity.*;
-import com.upgrad.FoodOrderingApp.service.exception.AddressNotFoundException;
-import com.upgrad.FoodOrderingApp.service.exception.AuthorizationFailedException;
 import com.upgrad.FoodOrderingApp.service.exception.CouponNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,12 +19,6 @@ public class OrderService {
 
     @Autowired
     private OrderDao orderDao;
-
-    @Autowired
-    private AddressDao addressDao;
-
-    @Autowired
-    private CustomerAddressDao customerAddressDao;
 
     @Autowired
     private OrderItemDao orderItemDao;
@@ -43,9 +34,9 @@ public class OrderService {
         return couponEntity;
     }
 
-    public List<OrdersEntity> getOrdersByCustomers(String customerId) {
-        List<OrdersEntity> orderEntityList = new ArrayList<>();
-        for (OrdersEntity orderEntity : orderDao.getOrdersByCustomers(customerDao.getCustomerByUUID(customerId))) {
+    public List<OrderEntity> getOrdersByCustomers(String customerId) {
+        List<OrderEntity> orderEntityList = new ArrayList<>();
+        for (OrderEntity orderEntity : orderDao.getOrdersByCustomers(customerDao.getCustomerByUUID(customerId))) {
             orderEntityList.add(orderEntity);
         }
         return orderEntityList;
@@ -62,7 +53,7 @@ public class OrderService {
 
     //Creating/Saving new order by customer
     @Transactional(propagation = Propagation.REQUIRED)
-    public OrdersEntity saveOrder(OrdersEntity orderEntity) {
+    public OrderEntity saveOrder(OrderEntity orderEntity) {
         return orderDao.createOrder(orderEntity);
     }
 

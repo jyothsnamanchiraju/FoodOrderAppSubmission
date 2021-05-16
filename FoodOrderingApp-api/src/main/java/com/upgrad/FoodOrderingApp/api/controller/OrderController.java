@@ -72,13 +72,13 @@ public class OrderController {
         CustomerEntity customerEntity = customerService.getCustomer(bearerToken[1]);
 
         // Get all orders by customer
-        List<OrdersEntity> orderEntityList = orderService.getOrdersByCustomers(customerEntity.getUuid());
+        List<OrderEntity> orderEntityList = orderService.getOrdersByCustomers(customerEntity.getUuid());
 
         CustomerOrderResponse customerOrderResponse = new CustomerOrderResponse();
 
         if (orderEntityList != null) {
 
-            for (OrdersEntity orderEntity : orderEntityList) { // loop through all the order entities
+            for (OrderEntity orderEntity : orderEntityList) { // loop through all the order entities
                 OrderListCoupon orderListCoupon = null;
 
                 /* Handling null value for coupon_id
@@ -178,7 +178,7 @@ public class OrderController {
             throw new SaveOrderException("SOR-001","No field should be empty except Coupon_Id and discount");
         }
 
-        final OrdersEntity orderEntity = new OrdersEntity();
+        final OrderEntity orderEntity = new OrderEntity();
         orderEntity.setUuid(UUID.randomUUID().toString());
 
         if(saveOrderRequest.getCouponId() != null) {
@@ -206,7 +206,7 @@ public class OrderController {
         orderEntity.setRestaurant(restaurantService.restaurantByUUID(saveOrderRequest.getRestaurantId().toString()));
         orderEntity.setDate(new Date());
         orderEntity.setBill(saveOrderRequest.getBill().doubleValue());
-        OrdersEntity savedOrderEntity = orderService.saveOrder(orderEntity);
+        OrderEntity savedOrderEntity = orderService.saveOrder(orderEntity);
 
         for (ItemQuantity itemQuantity : saveOrderRequest.getItemQuantities()) {
             OrderItemEntity orderItemEntity = new OrderItemEntity();

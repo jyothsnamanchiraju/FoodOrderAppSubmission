@@ -3,7 +3,6 @@ package com.upgrad.FoodOrderingApp.service.businness;
 import com.upgrad.FoodOrderingApp.service.dao.*;
 import com.upgrad.FoodOrderingApp.service.entity.*;
 import com.upgrad.FoodOrderingApp.service.exception.ItemNotFoundException;
-import com.upgrad.FoodOrderingApp.service.exception.RestaurantNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +25,7 @@ public class ItemService {
     @Autowired
     private CategoryDao categoryDao;
 
-    public List<OrderItemEntity> getItemsByOrder(OrdersEntity orderEntity) {
+    public List<OrderItemEntity> getItemsByOrder(OrderEntity orderEntity) {
         return orderItemDao.getItemsByOrder(orderEntity);
     }
 

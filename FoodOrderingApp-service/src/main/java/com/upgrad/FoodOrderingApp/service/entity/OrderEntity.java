@@ -12,10 +12,10 @@ import java.util.Date;
 @Entity
 @Table(name="orders")
 @NamedQueries({
-        @NamedQuery(name = "ordersByCustomer", query = "SELECT q FROM OrdersEntity q WHERE q.customer = :customerId ORDER BY q.date desc "),
-        @NamedQuery(name = "ordersByRestaurant", query = "select q from OrdersEntity q where q.restaurant = :restaurant"),
+        @NamedQuery(name = "ordersByCustomer", query = "SELECT q FROM OrderEntity q WHERE q.customer = :customerId ORDER BY q.date desc "),
+        @NamedQuery(name = "ordersByRestaurant", query = "select q from OrderEntity q where q.restaurant = :restaurant"),
 })
-public class OrdersEntity implements Serializable {
+public class OrderEntity implements Serializable {
 
     @Id
     @Column(name="id")                  //id
@@ -62,11 +62,11 @@ public class OrdersEntity implements Serializable {
     @NotNull
     private RestaurantEntity restaurant;
 
-    public OrdersEntity() {
+    public OrderEntity() {
 
     }
 
-    public OrdersEntity(@NotNull @Size(max = 200) String uuid, @NotNull Double bill, CouponEntity coupon, @NotNull Double discount, @NotNull Date date, @NotNull PaymentEntity payment, @NotNull CustomerEntity customer, @NotNull AddressEntity address, RestaurantEntity restaurant) {
+    public OrderEntity(@NotNull @Size(max = 200) String uuid, @NotNull Double bill, CouponEntity coupon, @NotNull Double discount, @NotNull Date date, @NotNull PaymentEntity payment, @NotNull CustomerEntity customer, @NotNull AddressEntity address, RestaurantEntity restaurant) {
         this.uuid = uuid;
         this.bill = new Double(bill);
         this.coupon = coupon;
