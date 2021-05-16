@@ -137,7 +137,7 @@ public class CustomerController {
             throw new UpdateCustomerException("UCR-002", "First name field should not be empty");
         }
 
-        if(firstName.equals("")){
+        if(firstName.trim().isEmpty()){
             throw new UpdateCustomerException("UCR-002", "First name field should not be empty");
         }
 

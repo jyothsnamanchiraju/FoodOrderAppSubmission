@@ -43,11 +43,11 @@ public class AddressService {
             throw new SaveAddressException("SAR-001", "No field can be empty.");
         }
 
-        if(addressEntity.getFlatBuilNo().isEmpty()
-                || addressEntity.getLocality().isEmpty()
-                || addressEntity.getCity().isEmpty()
-                || addressEntity.getPincode().isEmpty()
-                || addressEntity.getUuid().isEmpty()){
+        if(addressEntity.getFlatBuilNo().trim().isEmpty()
+                || addressEntity.getLocality().trim().isEmpty()
+                || addressEntity.getCity().trim().isEmpty()
+                || addressEntity.getPincode().trim().isEmpty()
+                || addressEntity.getUuid().trim().isEmpty()){
             throw new SaveAddressException("SAR-001", "No field can be empty.");
         }
 
