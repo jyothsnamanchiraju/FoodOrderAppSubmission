@@ -1,4 +1,4 @@
-/*
+
 package com.upgrad.FoodOrderingApp.api.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.UUID;
 
 import static org.mockito.Mockito.*;
+import static org.junit.Assert.*; // imported all the static methods in Assert
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -57,4 +58,4 @@ public class PaymentControllerTest {
         verify(mockPaymentService, times(1)).getAllPaymentMethods();
     }
 
-}*/
+}
