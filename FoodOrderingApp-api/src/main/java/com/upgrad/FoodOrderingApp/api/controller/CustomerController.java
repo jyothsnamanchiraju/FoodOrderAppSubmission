@@ -50,8 +50,8 @@ public class CustomerController {
             throw new SignUpRestrictedException("SGR-005", "Except last name all fields should be filled");
         }
 
-        if(signupCustomerRequest.getFirstName().equals("") || signupCustomerRequest.getEmailAddress().equals("") ||
-        signupCustomerRequest.getContactNumber().equals("") || signupCustomerRequest.getPassword().equals("")) {
+        if(signupCustomerRequest.getFirstName().trim().isEmpty() || signupCustomerRequest.getEmailAddress().trim().isEmpty() ||
+        signupCustomerRequest.getContactNumber().trim().isEmpty() || signupCustomerRequest.getPassword().trim().isEmpty()) {
             throw new SignUpRestrictedException("SGR-005", "Except last name all fields should be filled");
         }
 
